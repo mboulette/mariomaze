@@ -1,0 +1,635 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mario Test</title>
+    <script src="javascript/jquery-2.2.1.min.js"></script>
+    <script src="javascript/decorations.js"></script>
+    <script src="javascript/obstacles.js"></script>
+    <script src="javascript/treasures.js"></script>
+    <script src="javascript/levels.js"></script>
+    <script src="javascript/monsters.js"></script>
+
+    <script>
+        Number.prototype.between = function(a, b) {
+            var min = Math.min.apply(Math, [a, b]),
+            max = Math.max.apply(Math, [a, b]);
+            return this >= min && this <= max;
+        };
+
+        String.prototype.substitute = function(search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+
+        var pause = false;
+        var loadedMap = [];
+        var board;
+        var ctx;
+        var background;
+        var keyboard = [];
+        var show_bondaries = false;
+        var pattern = [];
+        var img = [
+            'images/mario.png',
+            'images/mario-background.jpg',
+            'images/tiles_spritesheet.png',
+            'images/hud_spritesheet.png',
+            'images/items_spritesheet.png',
+            'images/enemies_spritesheet.png',
+            'images/enemies.png',
+            'images/cave.jpg',
+        ];
+
+        var createPattern = function(ctx, img, x, y, width, height) { 
+            
+            var pattern_canvas = document.createElement('canvas');
+            var pattern_context = pattern_canvas.getContext('2d');
+
+            pattern_canvas.width = width;
+            pattern_canvas.height = height;
+
+            pattern_context.drawImage(img, x, y, width, height, 0, 0, width, height);
+
+            final_pattern = ctx.createPattern(pattern_canvas, "repeat");
+
+            return final_pattern;
+        }
+
+        var loadImg = function myself (img_id) {
+            if (img_id >= img.length) {
+
+                map.loadMap(maps[2], 'E1');
+                main();
+
+            } else {
+                src = img[img_id];
+
+                img[img_id] = new Image();
+                img[img_id].src = src;
+
+                img[img_id].onload = function() {
+                    myself(img_id);
+                }.bind(img_id);
+
+                img_id++;
+            }
+        };
+
+
+        var fireball = function(x, y, dir) {
+
+            this.trash = 0;
+            this.gravity = 2,
+            this.width = 40,
+            this.height = 40,
+            this.img = img[0];
+
+            this.current = {
+                'timer' : 0,
+                'x' : x,
+                'y' : y,
+                'frame' : 0,
+                'speed' : 25,
+                'dir' : dir,
+                'action' : 'burn',
+            },
+
+            this.action = {
+                'burn' : [
+                [(this.width * 1), 240, 25],
+                [(this.width * 2), 240, 25],
+                [(this.width * 3), 240, 25],
+                [(this.width * 4), 240, 25],
+                [(this.width * 5), 240, 25]
+                ]
+            },
+
+            this.boundaries = {
+                'left' : -2,
+                'right' : -2,
+                'top' : -8,
+                'bottom' : -8,
+            },
+
+            this.nextframe = function () {
+
+                if ((performance.now() - this.current.timer) > this.action[this.current.action][this.current.frame][2] && this.action[this.current.action][this.current.frame][2] != -1) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+
+                    this.current.timer = performance.now();
+                }
+            },
+
+            this.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                ctx.save();
+                if ( (this.current.dir == -1) ) {
+                    ctx.translate(this.current.x + (this.width/2), 0);
+                    ctx.scale(-1, 1);
+                    ctx.translate(0 - (this.current.x + (this.width/2)), 0);
+                }
+                
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+                
+                this.drawBondaries(ctx);
+            },
+
+            this.drawBondaries = function(ctx) {
+                
+                if (show_bondaries && this.trash == 0) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x-this.boundaries.left, this.current.y-this.boundaries.top, this.width+this.boundaries.left+this.boundaries.right, this.height+this.boundaries.top+this.boundaries.bottom);
+                    ctx.stroke();
+                }                
+            },
+
+            this.script = function() {
+                
+                turn = false;
+                for (var i = 0; i < map.monsters.length; i++) {
+                    
+
+                    if (map.monsters[i].hit(this.current.x, this.current.y, this.current.x+this.width, this.current.y+this.height)) {
+                        this.trash = 1;
+                        map.monsters[i].die();
+                    }
+                }
+
+            },
+
+            this.move = function() {
+
+                this.script();
+
+                this.current.x += (this.current.speed * this.current.dir);
+                this.current.y += this.gravity;
+                this.current.speed--;
+                
+                this.nextframe();
+
+                if (this.current.speed <= 0) this.trash = 1;
+            }
+
+        };  
+
+        var player = function() {
+
+            this.ammos = 200,
+            this.lives = 3,
+            this.coins = 400,
+            this.keys = 2,
+            this.width = 46,
+            this.height = 90,
+            this.speed = 5,
+            this.leap = -15,
+            this.gravity = 0.5,
+            this.friction = 0.5,
+
+            this.current = {
+                'x'         : 0,
+                'y'         : 0,
+                'velX'      : 0,
+                'velY'      : 0,
+                'running'   : 1,
+                'jumping'   : 0,
+                'grounding' : 0,
+                'action'    : 'wait',
+                'timer'     : performance.now(),
+                'frame'     : 0,
+                'face'      : 'right',
+            },
+
+            this.boundaries = {
+                'left' : -12,
+                'top' : -7,
+            },
+
+            this.action = {
+
+                'wait'  : [[490, 0, 800], [560, 0, 200], [630, 0, 800], [560, 0, 200] ],                                                                    //attendre
+                'walk'  : [[0, 0, 50], [70, 0, 50], [140, 0, 50], [210, 0, 50], [280, 0, 50], [350, 0, 50], [420, 0, 50], [350, 0, 50] ],                   //marcher
+                'run'   : [[0, 0, 20], [70, 0, 20], [140, 0, 20], [210, 0, 20], [280, 0, 20], [350, 0, 20], [420, 0, 20], [350, 0, 20] ],                   //courrir
+                'jump'  : [[0, 100, 50], [70, 100, 1000], 'fall'],                                                                                          //sauter
+                'fall'  : [[0, 0, 100], [210, 101, -1] ],                                                                                                   //tomber
+                'land'  : [[0, 100, 50], [290, 100, 50], 'wait' ],                                                                                          //Atterrir
+                'stoop' : [[280, 100, -1] ],                                                                                                                //se baisser
+                'getup' : [[0, 0, 200], 'wait'],                                                                                                            //se lever 
+
+            },
+
+            this.draw = function() {
+                
+                ctx.save();
+
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                if ( (this.current.face == 'left') ) {
+                    ctx.translate(this.current.x + (this.width/2), 0);
+                    ctx.scale(-1, 1);
+                    ctx.translate(0 - (this.current.x + (this.width/2)), 0);
+                }
+                
+                if (show_bondaries) {
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x, this.current.y, this.width, this.height);
+                    ctx.stroke();
+                }
+                
+
+                ctx.drawImage(img[0], x, y, 70, 100, this.current.x+this.boundaries.left, this.current.y+this.boundaries.top, 70, 100);
+
+                ctx.restore();
+            },
+
+            this.nextframe = function () {
+
+                if ((performance.now() - this.current.timer) > this.action[this.current.action][this.current.frame][2] && this.action[this.current.action][this.current.frame][2] != -1) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+
+                    this.current.timer = performance.now();
+                }
+            },
+
+
+            this.previewX = function() {                   
+                return this.current.x + this.current.velX + this.friction;
+            },
+
+            this.previewY = function() {
+                return this.current.y + this.current.velY + this.gravity;
+            },
+
+            this.die = function () {
+                
+                keyboard = [];
+                this.current.velX = 0;
+                this.current.velY = 0;
+                this.lives--;
+                map.projectiles = [];
+
+                pause=true;
+                overlay.toogle();
+
+
+            }
+
+            this.move = function () {
+
+                if (this.current.velX > 0) {
+                    this.current.velX -= this.friction;
+                    this.current.face = 'right';
+                }
+                if (this.current.velX < 0) {
+                    this.current.velX += this.friction;
+                    this.current.face = 'left';
+                }
+
+                if (this.current.velY < Math.abs(this.leap)+1 ) this.current.velY += this.gravity;
+
+                this.current.x += this.current.velX;
+                this.current.y += this.current.velY;
+
+                if (this.current.y > map.height) {
+                    this.die();
+                }
+
+            }
+
+
+        };
+
+
+        var update = function() {
+
+            for (var i = 0; i < map.monsters.length; i++) {
+                map.monsters[i].move();
+            }
+
+            for (var i = 0; i < map.projectiles.length; i++) {
+                map.projectiles[i].move();
+            }
+
+            mario.nextframe();
+
+            next_action = 'wait';
+
+            if (keyboard[88] && mario.ammos > 0) { //x (shoot)
+
+                stoop = (keyboard[40]) ? 20 : 0;
+
+                if (mario.current.face == 'right') { 
+                    var tmp = new fireball(mario.current.x+mario.width, mario.current.y+20+stoop, 1);
+                } else {
+                    var tmp = new fireball(mario.current.x, mario.current.y+20+stoop, -1);
+                }
+
+                map.projectiles.push(tmp);
+                mario.ammos--;
+                keyboard[88] = false;
+            }
+
+            if (keyboard[40]) { //down arrow
+                next_action = 'stoop';
+            }
+
+            if (keyboard[18] || keyboard[90]) { // alt
+                mario.running = 1 + (3/5);
+            } else {
+                mario.running = 1;
+            }
+
+            if (keyboard[39]) { // right arrow
+                if (mario.current.velX < mario.speed * mario.running) {
+                    mario.current.velX++;
+                }
+                next_action = 'walk';
+                if (mario.running > 1) next_action = 'run';
+            }
+
+            if (keyboard[37]) { // left arrow
+                if (mario.current.velX > -mario.speed * mario.running) {
+                    mario.current.velX--;
+                }
+                next_action = 'walk';
+                if (mario.running > 1) next_action = 'run';
+            }
+
+            if (keyboard[38] || keyboard[32]) { // up arrow or space
+                if (!mario.current.jumping && mario.current.grounding) {
+                    mario.current.jumping = 1;
+                    mario.current.velY = mario.leap;
+                }
+                
+            }
+
+            if ( mario.current.grounding == 0) next_action = 'fall';
+            if ( mario.current.jumping == 1 && mario.current.velY < 0 ) next_action = 'jump';
+
+            if (mario.current.action != next_action) {
+                mario.current.action = next_action;
+                mario.current.frame = 0;
+            }
+
+            mario.move();
+
+        };
+
+
+        var collision = function() {
+
+            mario.current.grounding = 0;
+
+            for (var i = 0; i < map.monsters.length; i++) {
+                map.monsters[i].collision(mario);
+            }
+
+            for (var i = 0; i < map.items.length; i++) {
+                map.items[i].collision(mario);
+            }
+
+            for (var i = 0; i < map.obstacles.length; i++) {
+                map.obstacles[i].collision(mario);
+            }
+        };
+
+
+        var render = function() {
+            
+
+            ctx.save();
+
+            //ctx.clearRect(0, 0, board.width, board.height);            
+            ctx.rect(0, 0, board.width, board.height);
+            ctx.fill();
+            
+
+
+
+            var translation = { 'x' : map.translation.x, 'y' : map.translation.y};
+
+            if (mario.current.x > board.width/2) {
+                translation.x += ((board.width/2) - mario.current.x)/10;
+            }
+            if (mario.current.y < board.height/2) {
+                translation.y += ((board.height/2) - mario.current.y)/10; 
+            }
+            
+
+
+            ctx.translate(translation.x, translation.y);
+            ctx.rect(0, 0, board.width-translation.x, board.height-translation.y);
+            ctx.fillStyle = background;
+            ctx.fill();
+
+            ctx.restore();
+            ctx.save();
+
+            if (mario.current.x > board.width/2) {
+                ctx.translate(Math.max((board.width/2) - mario.current.x, board.width-map.width), 0);
+            }
+            if (mario.current.y > board.height/2) {
+                ctx.translate(0, Math.max((board.height/2) - mario.current.y, board.height-map.height));
+            }
+
+            map.draw();
+            if (!pause) mario.draw();
+
+            ctx.restore();
+
+            drawFrame();
+
+            overlay.draw();
+
+        };
+
+        var drawFrame = function() {
+
+            ctx.save();
+            ctx.globalAlpha = 0.6;            
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            ctx.rect(0, 0, board.width, 30);
+            ctx.stroke();
+            
+
+            ctx.fill();
+            
+            ctx.font = '14pt Comic Sans MS';
+            ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
+            ctx.lineWidth = 5;
+
+            ctx.font = '10pt Comic Sans MS';
+            ctx.textAlign="left";
+            ctx.fillText("x:"+Math.floor((mario.current.x+mario.height)/70)+", y:"+Math.floor(mario.current.y/70), 10, 18);
+
+            ctx.font = '14pt Comic Sans MS';
+            ctx.textAlign="center";
+            ctx.strokeText(map.name, board.width/2, 22);
+            ctx.fillText(map.name, board.width/2, 22);
+            
+
+            ctx.textAlign="right";
+            ctx.strokeText(mario.lives+' x', board.width-70, 22);
+            ctx.fillText(mario.lives+' x', board.width-70, 22);
+            ctx.drawImage(img[3], 0, 93, 53, 47, board.width-64, 4, 53/2, 47/2);
+
+            ctx.strokeText(mario.keys+' x', board.width-170, 22);
+            ctx.fillText(mario.keys+' x', board.width-170, 22);
+            ctx.drawImage(img[3], 146, 189, 44, 40, board.width-164, 5, 44/2, 40/2);
+
+            ctx.strokeText(mario.ammos+' x', board.width-270, 22);
+            ctx.fillText(mario.ammos+' x', board.width-270, 22);
+            ctx.drawImage(img[0], 0, 240, 40, 40, board.width-268, 2, 25, 25);   
+
+            ctx.strokeText(mario.coins+' x', board.width-370, 22);
+            ctx.fillText(mario.coins+' x', board.width-370, 22);
+            ctx.drawImage(img[0], 200, 200, 40, 40, board.width-364, 3, 23, 23);   
+            
+            ctx.restore();
+
+        };
+
+        var overlays = function() {
+            this.timer = 0;
+            this.action = 'reduce';
+            this.frame = 0;
+
+            this.start = function(growing) {
+                this.timer = performance.now();
+                this.action = 'reduce';
+                if(growing) this.action = 'grow';
+                this.frame = 0;
+            };
+
+            this.toogle = function() {
+                
+                this.start(true);
+
+                setTimeout(function(object){ 
+                    mario.current.x = map.start.x;
+                    mario.current.y = map.start.y;
+                    
+                    overlay.start(false);
+                    pause=false;
+
+                }, 400, this);
+
+            }
+
+            this.draw = function() {
+                
+                if ((performance.now() - this.timer) > 10 && this.frame < 10) {
+                    this.frame++;
+                    this.timer = performance.now();
+                }
+
+                if (this.action == 'reduce') {
+                    dim = ((10-this.frame) * 0.1);
+                    pos = (this.frame * 0.1) * 0.5;
+                } else {
+                    dim = (this.frame * 0.1);
+                    pos = ((10-this.frame) * 0.1) * 0.5;
+                }
+
+                ctx.rect(board.width*pos, board.height*pos, board.width*dim, board.height*dim);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fill();
+            };
+
+        };
+
+        var main = function() {
+
+            
+
+            if (performance.now() - timer > 5) { 
+
+                if (!pause) {
+                    collision();
+                    update();
+                }                
+                
+                render();
+
+                timer = performance.now();
+               
+                map.clean();
+            }
+
+            requestAnimationFrame(main);
+        };
+
+
+        $( document ).ready(function() {
+
+            board = $('canvas')[0];
+            ctx = board.getContext('2d');
+
+
+            timer = performance.now();
+            mario = new player();
+            map = new level();
+            overlay = new overlays();           
+
+            loadImg(0);
+
+            $(document).on('keydown', function (e) {
+                keyboard[e.which] = true;
+
+                if (e.which == '80') {
+                    pause = !pause;
+                    overlay.start(pause);
+                }
+                return false;
+            });
+
+            $(document).on('keyup', function (e) {
+                keyboard[e.which] = false;
+                return false;
+            });
+
+
+
+        });
+
+    </script>
+
+</head>
+
+<body style='background-color:#efefef;'>
+
+<canvas width="1024" height="630" style="border:1px solid #000;"></canvas>
+
+</body>
+</html>
