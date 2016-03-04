@@ -473,19 +473,18 @@
         var drawFrame = function() {
 
             ctx.save();
-            ctx.globalAlpha = 0.6;            
+            //ctx.globalAlpha = 0.5;
 
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
-            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.rect(0, 0, board.width, 30);
             ctx.stroke();
-            
-
             ctx.fill();
+
             
             ctx.font = '14pt Comic Sans MS';
-            ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+            ctx.fillStyle = '#FFFFFF';//'rgba(255, 255, 255, 1)';
             ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
             ctx.lineWidth = 5;
 

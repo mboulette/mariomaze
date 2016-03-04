@@ -186,7 +186,6 @@
         var torches = function(param) {
 
             tmp = new decorations(['decorations', param[1], param[2], 70, 70, 2, 1, 1]);
-            if (tmp.me) tmp = tmp.me;
             map.items.push(tmp);
 
             param[2] -= 30;
