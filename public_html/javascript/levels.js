@@ -87,7 +87,7 @@ var level = function() {
 
                     for (x = 0; x < lines.length; x++) {
 
-                        console.log(lines[x]);
+                        //console.log(lines[x]);
 
                         if (lines[x][0] == 'E') {
                             if (this.exits[lines[x]]) {
@@ -211,11 +211,11 @@ var level = function() {
             '+ ' : {'groupe' : 'items',     'define' : ['keys', 0, 0]},
             'S1' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 7, 4]},
             'S2' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 3, 0]},
-            'SE' : {'groupe' : 'obstacles', 'define' : ['shop', 0, 0, 70, 70, 2, 4, 6]},
-            'E0' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 4, 3]},
+            'SE' : {'groupe' : 'obstacles', 'define' : ['sign', 0, 0, 70, 70, 2, 4, 6, 'A VENDRE']},
+            'E0' : {'groupe' : 'obstacles', 'define' : ['sign', 0, 0, 70, 70, 2, 4, 3, 'DÉPART']},
             'E1' : {'groupe' : 'items',     'define' : ['openDoors', 0, 0, 'E1']},
             'E2' : {'groupe' : 'items',     'define' : ['lockDoors', 0, 0, 'E2']},
-            'E3' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 4, 5]},
+            'E3' : {'groupe' : 'items',     'define' : ['sign', 0, 0, 70, 70, 2, 4, 6, 'SORTIE']},
             'M1' : {'groupe' : 'monsters',  'define' : ['snails', 0, 0]},
             'M2' : {'groupe' : 'monsters',  'define' : ['rats', 0, 0]}
         };
@@ -251,12 +251,12 @@ var level = function() {
                 'plan' : [
 
                     "-                                                                        |",
-                    "-                                                           <##>         |",
-                    "-                                                         <#«##»#>       |",
-                    "-                                                         S2S2S2S2       |",
-                    "-                                                         S2SEE2S2       |",
-                    "-                                                       <==========>     |",
-                    "-                                                                        |",
+                    "-                                                             <##>       |",
+                    "-                                                           <#«##»#>     |",
+                    "-                                                           S2S2S2S2     |",
+                    "-                                                       SE  S2S2E2S2     |",
+                    "-                                                       <============>   |",
+                    "-                                               $                        |",
                     "-                                             <====>                     |",
                     "-                                                                        |",
                     "-                                                                        |",

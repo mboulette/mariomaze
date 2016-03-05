@@ -426,24 +426,18 @@
 
             ctx.save();
 
-            //ctx.clearRect(0, 0, board.width, board.height);            
-            ctx.rect(0, 0, board.width, board.height);
-            ctx.fill();
+            ctx.clearRect(0, 0, board.width, board.height);
+
             
-
-
-
             var translation = { 'x' : map.translation.x, 'y' : map.translation.y};
 
             if (mario.current.x > board.width/2) {
                 translation.x += ((board.width/2) - mario.current.x)/10;
             }
-            if (mario.current.y < board.height/2) {
+            if (mario.current.y > board.height/2) {
                 translation.y += ((board.height/2) - mario.current.y)/10; 
             }
             
-
-
             ctx.translate(translation.x, translation.y);
             ctx.rect(0, 0, board.width-translation.x, board.height-translation.y);
             ctx.fillStyle = background;
@@ -473,14 +467,16 @@
         var drawFrame = function() {
 
             ctx.save();
-            //ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.8;
 
+            
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.rect(0, 0, board.width, 30);
             ctx.stroke();
             ctx.fill();
+            
 
             
             ctx.font = '14pt Comic Sans MS';
@@ -560,10 +556,13 @@
                     dim = (this.frame * 0.1);
                     pos = ((10-this.frame) * 0.1) * 0.5;
                 }
-
+                ctx.save();
+                ctx.beginPath();
                 ctx.rect(board.width*pos, board.height*pos, board.width*dim, board.height*dim);
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
                 ctx.fill();
+
+                ctx.restore();
             };
 
         };

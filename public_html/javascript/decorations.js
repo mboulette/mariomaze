@@ -18,21 +18,24 @@
     };
 
 
-    var shop = function(param) {
+
+    var sign = function(param) {
         this.me = new decorations(param);
 
         this.me.draw = function(ctx) {
-            ctx.drawImage(img[this.spriteImg], 3*72, 0*72, this.width, this.height, this.x, this.y, this.width, this.height);
+            //ctx.drawImage(img[this.spriteImg], 3*72, 0*72, this.width, this.height, this.x, this.y, this.width, this.height);
             ctx.drawImage(img[this.spriteImg], this.spriteX*72, this.spriteY*72, this.width, this.height, this.x, this.y, this.width, this.height);
 
-            ctx.font = '9pt Comic Sans MS';
-            ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-            ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
-            ctx.lineWidth = 5;
+            ctx.font = 'bold 18pt Comic Sans MS';
+            ctx.fillStyle = '#CFA67C';
+            ctx.strokeStyle = '#A06D3D';
+            ctx.lineWidth = 2;
 
             ctx.textAlign="center";
-            ctx.strokeText('Marchand', this.x + (this.width / 2), this.y + (this.height / 2));
-            ctx.fillText('Marchand', this.x + (this.width / 2), this.y + (this.height / 2));
+            //ctx.strokeText('A VENDRE', this.x + (this.width / 2), this.y + (this.height / 2));
+            ctx.strokeText(param[8], this.x + (this.width / 2)-1, this.y + (this.height / 2)-1, 58);
+            ctx.fillText(param[8], this.x + (this.width / 2), this.y + (this.height / 2), 58);
+
 
         }
 
