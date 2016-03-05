@@ -29,7 +29,7 @@
         var ctx;
         var background;
         var keyboard = [];
-        var show_bondaries = false;
+        var show_bondaries = true;
         var pattern = [];
         var img = [
             'images/mario.png',
@@ -40,6 +40,7 @@
             'images/enemies_spritesheet.png',
             'images/enemies.png',
             'images/cave.jpg',
+            'images/super-mario-makertileset.png',
         ];
 
         var createPattern = function(ctx, img, x, y, width, height) { 
@@ -60,7 +61,7 @@
         var loadImg = function myself (img_id) {
             if (img_id >= img.length) {
 
-                map.loadMap(maps[2], 'E1');
+                map.loadMap(maps[3], 'E3');
                 main();
 
             } else {

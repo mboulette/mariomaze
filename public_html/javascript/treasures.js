@@ -780,7 +780,95 @@
         };
 
 
+        var exit = function(param) {
+            this.me = new treasures(param);
+            this.me.img = img[2];
+            this.me.width = 70;
+            this.me.height = 70;
+            this.me.exit = param[3];
 
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                if (param[3] == 'E>') { 
+                    ctx.drawImage(this.img, 4*72, 3*72, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                } else { 
+                    ctx.drawImage(this.img, 4*72, 4*72, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                }
+
+                ctx.font = 'bold 18pt Comic Sans MS';
+                ctx.fillStyle = '#CFA67C';
+                ctx.strokeStyle = '#A06D3D';
+                ctx.lineWidth = 2;
+
+                ctx.textAlign="center";
+                ctx.strokeText('SORTIE', this.current.x + (this.width / 2)-1, this.current.y + (this.height / 2)-1, 58);
+                ctx.fillText('SORTIE', this.current.x + (this.width / 2), this.current.y + (this.height / 2), 58);
+
+                this.drawBondaries(ctx);    
+            };
+
+            this.me.loadNewMap = function(object) {
+                loadedMap[map.id] = $.extend({}, map);
+
+                keyboard = [];
+                object.current.velX = 0;
+                object.current.velY = 0; 
+                map.projectiles = [];   
+
+                pause=true;
+                overlay.start(true);
+
+                //console.log(this.exit, map.exits);
+
+
+                setTimeout(function(door){ 
+                    
+                    //console.log(map.exits, door.exit);
+
+                    if (loadedMap[map.exits[door.exit]['map']]) {
+                        
+                        pos = map.exits[door.exit]['pos'];
+                        map = loadedMap[map.exits[door.exit]['map']];
+                        background = ctx.createPattern(img[map.background], "repeat"); 
+
+                        console.log(map.exits, pos);
+
+                        object.current.x = map.exits[pos]['x'];
+                        object.current.y = map.exits[pos]['y'];
+                        map.start.x = map.exits[pos]['x'];
+                        map.start.y = map.exits[pos]['y'];
+
+                    } else {
+                        
+                        map.obstacles = [];
+                        map.monsters = [];
+                        map.items = [];
+                        map.projectiles = [];
+
+                        map.loadMap(maps[map.exits[door.exit]['map']], map.exits[door.exit]['pos']);                       
+                    }
+
+                    overlay.start(false);
+                    pause=false;
+
+                }, 400, this);
+
+
+            };
+
+            this.me.collision = function(object) {
+                
+                x1 = object.current.x; y1 = object.current.y; x2 = object.current.x + object.width; y2 = object.current.y + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    keyboard = [];
+                    this.loadNewMap(object);
+                }
+            };
+
+        };
 
 
 

@@ -87,10 +87,13 @@ var level = function() {
 
                     for (x = 0; x < lines.length; x++) {
 
-                        //console.log(lines[x]);
+                        //console.log(lines[x], x, y);
 
                         if (lines[x][0] == 'E') {
-                            if (this.exits[lines[x]]) {
+                            
+                            if (!this.exits[lines[x]]) {
+                                this.exits[lines[x]] = {'x' : x*69+1, 'y' : y*69 };
+                            } else  {
                                 this.exits[lines[x]]['x'] = x*69;
                                 this.exits[lines[x]]['y'] = y*69;
                             }
@@ -179,6 +182,8 @@ var level = function() {
             '__' : {'groupe' : 'obstacles', 'define' : ['platforms', 0, 0, 70, 70, 2, 11, 2]},
             '_>' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 11, 01]},
             '_ ' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 4, 11]},
+            'T0' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 8, 14, 0]},
+            '0T' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 8, 15, 0]},
 
             '- ' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 8, 12]},
 
@@ -190,12 +195,13 @@ var level = function() {
 
             '##' : {'groupe' : 'obstacles', 'define' : ['brickwall', 0, 0]},
             '#1' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 10, 12]},
-            'W#' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 1, 0]},
+            '#2' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 11, 0]},
+            'W#' : {'groupe' : 'obstacles', 'define' : ['windows', 0, 0, 70, 70, 2, 10, 12]},
             '<#' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 10, 2]},
             '#>' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 10, 0]},
             '«#' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 10, 1]},
             '#»' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 9, 12]},
-            'F#' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 0, 0]},
+            'F ' : {'groupe' : 'obstacles', 'define' : ['flags', 0, 0, 70, 70, 4, 3, 5]},
 
 
             '? ' : {'groupe' : 'obstacles', 'define' : ['surprises', 0, 0]},
@@ -212,12 +218,17 @@ var level = function() {
             'S1' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 7, 4]},
             'S2' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 3, 0]},
             'SE' : {'groupe' : 'obstacles', 'define' : ['sign', 0, 0, 70, 70, 2, 4, 6, 'A VENDRE']},
-            'E0' : {'groupe' : 'obstacles', 'define' : ['sign', 0, 0, 70, 70, 2, 4, 3, 'DÉPART']},
+            'E0' : {'groupe' : 'items',     'define' : ['sign', 0, 0, 70, 70, 2, 4, 3, 'DÉPART']},
             'E1' : {'groupe' : 'items',     'define' : ['openDoors', 0, 0, 'E1']},
             'E2' : {'groupe' : 'items',     'define' : ['lockDoors', 0, 0, 'E2']},
-            'E3' : {'groupe' : 'items',     'define' : ['sign', 0, 0, 70, 70, 2, 4, 6, 'SORTIE']},
+            'E3' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 15, 15]},
+            'E>' : {'groupe' : 'items',     'define' : ['exit', 0, 0, 'E>']},
+            'E<' : {'groupe' : 'items',     'define' : ['exit', 0, 0, 'E<']},
+
             'M1' : {'groupe' : 'monsters',  'define' : ['snails', 0, 0]},
-            'M2' : {'groupe' : 'monsters',  'define' : ['rats', 0, 0]}
+            'M2' : {'groupe' : 'monsters',  'define' : ['rats', 0, 0]},
+            'M3' : {'groupe' : 'monsters',  'define' : ['plants', 0, 0]},
+            'M4' : {'groupe' : 'monsters',  'define' : ['breaths', 0, 0]}
         };
 
         var maps = {
@@ -247,7 +258,7 @@ var level = function() {
                 'name' : 'Carte #1.0',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
-                "exits" : {'E2' : {'map' : 2, 'pos' :  'E1'}},
+                "exits" :   {'E2' : {'map' : 2, 'pos' :  'E1'}, 'E>' : {'map' : 3, 'pos' :  'E3'}},
                 'plan' : [
 
                     "-                                                                        |",
@@ -262,7 +273,7 @@ var level = function() {
                     "-                                                                        |",
                     "-                                                                        |",
                     "-     + M1                        $   $   $         $ $                   ",
-                    "-     <======>                            M1                            E3",
+                    "-     <======>                            M1                          E3E>",
                     "-                                 ##########        oooo            ######",
                     "-                 !                                               ########",
                     "-         $ $$$                                                 ##########",
@@ -292,29 +303,29 @@ var level = function() {
                     "[][]          E1          [][][][][][][][][]$ $   M2      M2$ $ [][]",
                     "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
                     ]
-            }
-/*
+            },
+
             3 : {
                 'id' : 3,
                 'name' : 'Carte #3',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
-                "exits" : {'E2' : {'map' : 2, 'pos' :  'E1'}},
+                "exits" : {'E<' : {'map' : 1, 'pos' :  'E3'}},
                 'plan' : [
-                    "|                                                                     |",
-                    "|                                                          F          |",
-                    "|                                                        <##1#>       |",
-                    "|                                                      <#«##1#»#>     |",
-                    "|                                                      #1W##1W##1     |",
-                    "|                                                    _ #1_ #1_ #1_    |",
-                    "|                                                    [][][][][][][]   |",
-                    "|                                                    S1S1S1S1[][][]   |",
-                    "                                                     S1S1S1E2[][][]   |",
-                    "E3                                             <=======================",
-                    "|                                                                     |",
+                    "|                                                                      |",
+                    "|                                                           F          |",
+                    "|                                                       #2  #2  #2     |",
+                    "|                                                       #1#1#1#1#1     |",
+                    "|                                                       #1W##1W##1     |",
+                    "|                                                     _ #1_ #1_ #1_    |",
+                    "|                                                     [][][][][][][]   |",
+                    "|                                                     S1S1S1S1[][][]   |",
+                    "                                                      S1S1S1E2[][][]   |",
+                    "E<E3      M3    M4                              <=======================",
+                    "======================================                                 |",
 
                     ]
 
             },
-*/
+
         };

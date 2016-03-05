@@ -246,3 +246,226 @@
         };
 
 
+        var plants = function(param) {
+
+            tmp = new hitZone(['boxes', param[1]-35, param[2], 142, 70, 8, 14, 0]);
+            map.obstacles.push(tmp);
+
+            param[2] += 2;
+            this.me = new monsters(param);
+            this.me.img = img[0];
+            this.me.current.action = 'hide';
+            this.me.width = 70;
+            this.me.height = 0;
+            this.me.y = param[2];
+            this.me.maxY = param[2];
+            this.me.minY = param[2] - 140;
+
+            this.me.boundaries = {
+                'left' : -4,
+                'right' : -6,
+                'top' : 0,
+                'bottom' : 0,
+            },
+
+            this.me.die = function() {
+                this.current.action = 'dead';
+                this.current.frame = 0;
+            },
+
+            this.me.action = {
+                'grow' : [
+                     [0*72, 5*72, 1000], 'eat',
+                ],
+                'hide' : [
+                     [0*72, 5*72, 4000], 'grow',
+                ],
+                'dead' : [
+                     [0*72, 5*72, 10000], 'grow',
+                ],
+                'eat' : [
+                     [0*72, 5*72, 1000],
+                     [1*72, 5*72, 25],
+                     [2*72, 5*72, 25],
+                     [3*72, 5*72, 500],
+                     [2*72, 5*72, 25],
+                     [1*72, 5*72, 25],
+                     [0*72, 5*72, 1000],
+                     [1*72, 5*72, 25],
+                     [2*72, 5*72, 25],
+                     [3*72, 5*72, 500],
+                     [2*72, 5*72, 25],
+                     [0*72, 5*72, 1000],
+                     'hide',
+                ],
+            }
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.script = function() {
+                
+                //console.log(this.current.action, this.current.y, this.minY, this.maxY );
+                if (this.current.action == 'grow') {
+                    if (this.current.y > this.minY) {
+                        this.current.y -= this.current.speed;
+                        this.height += this.current.speed;
+                    }
+                }
+                if (this.current.action == 'hide') {
+                    if (this.current.y < this.maxY) {
+                        this.current.y += this.current.speed;
+                        this.height -= this.current.speed;
+                    }
+                }
+                if (this.current.action == 'dead') {
+                    if (this.current.y < this.maxY) {
+                        this.current.y += (this.current.speed * 2);
+                        this.height -= (this.current.speed * 2);
+                    }
+                }
+            },
+
+            this.me.move = function() {
+
+                if (this.trash != 0) return;
+
+                this.script();
+
+                if ((performance.now() - this.current.timer) >this.action[this.current.action][this.current.frame][2]) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+                    this.current.timer = performance.now();
+
+                }
+
+            }  
+
+
+        };
+
+
+
+        var breaths = function(param) {
+
+            tmp = new hitZone(['boxes', param[1]+1, param[2], 69, 70, 8, 1, 33]);
+            map.obstacles.push(tmp);
+
+            param[2] += 20;
+            this.me = new monsters(param);
+            this.me.img = img[0];
+            this.me.current.action = 'burn';
+            this.me.current.speed = 10;
+            this.me.width = 70;
+            this.me.height = 0;
+            this.me.y = param[2];
+            this.me.maxY = param[2];
+            this.me.minY = param[2] - 140;
+            this.me.burning = 0;
+            this.me.burnigTimer = performance.now();
+
+            this.me.boundaries = {
+                'left' : -4,
+                'right' : -6,
+                'top' : 0,
+                'bottom' : 0,
+            },
+
+            this.me.die = function() {
+
+            },
+
+            this.me.action = {
+                'burn' : [
+                     [5*72, 5*72, 75],
+                     [6*72, 5*72, 75],
+                     [7*72, 5*72, 75],
+                     [8*72, 5*72, 75],
+                ],
+            }
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.script = function() {
+                
+                if (this.burning == 1) {
+                    if (this.current.y > this.minY) {
+                        this.current.y -= this.current.speed;
+                        this.height += this.current.speed;
+                    }
+
+                    if (performance.now() - this.burnigTimer > 2000) {
+                        this.burning = 0;
+                        this.burnigTimer = performance.now();
+                    }
+
+                }
+                if (this.burning == 0) {
+                    if (this.current.y < this.maxY) {
+                        this.current.y += this.current.speed;
+                        this.height -= this.current.speed;
+                    }
+
+                    if (performance.now() - this.burnigTimer > 5000) {
+                        this.burning = 1;
+                        this.burnigTimer = performance.now();
+                    }
+                }
+
+
+            },
+
+            this.me.move = function() {
+
+                if (this.trash != 0) return;
+
+                this.script();
+
+                if ((performance.now() - this.current.timer) >this.action[this.current.action][this.current.frame][2]) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+                    this.current.timer = performance.now();
+
+                }
+
+            }  
+
+
+        };
