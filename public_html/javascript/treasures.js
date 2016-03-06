@@ -235,6 +235,62 @@
 
         };
 
+        
+        var stars = function(param) {
+            this.me = new treasures(param);
+            this.me.width = 60;
+            this.me.height = 60;
+            this.me.current.x += 5;
+            this.me.current.y += 0;
+            this.me.img = img[0];
+            this.me.current.action = 'glow';
+            this.me.action.glow = [[0, 280, 2000], [60, 280, 75], [120, 280, 75], [180, 281, 75], [120, 280, 75], [60, 280, 75], ];
+            this.me.glowTimer = performance.now();
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+
+                if (this.trash > 1)  {
+                    this.trash++;
+                    this.current.y -= 10;
+                    ctx.globalAlpha = 1-this.trash/30;
+
+                    if (this.trash >= 30) this.trash = 1;
+                }
+
+                glow = this.action[this.current.action][this.current.frame];
+                ctx.drawImage(this.img, glow[0], glow[1], this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                //console.log(performance.now() - this.glowTimer);
+                if (performance.now() - this.glowTimer > 100) {
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'color-burn';
+                    ctx.drawImage(this.img, glow[0], glow[1], this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                    ctx.restore();
+
+                    this.glowTimer = performance.now();                
+                } 
+
+
+                this.drawBondaries(ctx);
+                this.nextframe();
+            };
+
+            this.me.bonus = function(object) {
+                object.invincible = true;
+                setTimeout(function(object){ 
+                    object.invincible = false;
+
+                }, 20000, object);
+            };
+
+        };
+        
+
         var diamons = function(param) {
             this.me = new treasures(param);
             this.me.width = 46;
@@ -317,7 +373,6 @@
 
         };
 
-
         var surprises = function(param) {
             this.me = new treasures(param);
             this.me.img = img[2];
@@ -333,12 +388,15 @@
                 items = [];
 
                 for (var i = 0; i < nbitem; i++) {
-                    chance = Math.floor(Math.random() * 100);
+                    chance = Math.floor(Math.random() * 200);
                     switch(true) {
-                        case (chance > 97) :
+                        case (chance > 197) :
                             items.push('hearts');
                             break;
-                        case (chance > 90) :
+                        case (chance > 190) :
+                            items.push('stars');
+                            break;
+                        case (chance > 180) :
                             items.push('keys');
                             break;
                         default:
@@ -461,6 +519,33 @@
         };
 
 
+        var surpriseBlock = function(param) {
+            surp = new surprises(param);
+            this.me = surp.me;
+
+            this.me.loadEmptyBloc = function() {
+                this.trash = 1;
+                tmp = new brickwall(['brickwall', this.current.x, this.current.y]);
+                if (tmp.me) tmp = tmp.me;
+                tmp.choc = -20;
+                map.items.push(tmp);    
+            };
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.drawImage(this.img, 3*72, 0, this.width, this.height, this.current.x, this.current.y+this.choc, this.width, this.height);
+
+                this.drawBondaries(ctx);
+
+                this.nextframe();
+                this.choc = (this.choc == 0) ? 0 : this.choc+5;
+            };
+
+        };
+
+
         var openDoors = function(param) {
             this.me = new treasures(param);
             this.me.img = img[2];
@@ -489,7 +574,9 @@
                 pause=true;
                 overlay.start(true);
                 setTimeout(function(door){ 
-                    
+
+                    console.log(map.exits);
+
                     if (loadedMap[map.exits[door.exit]['map']]) {
                         
                         pos = map.exits[door.exit]['pos'];
@@ -500,6 +587,11 @@
                         object.current.y = map.exits[pos]['y'];
                         map.start.x = map.exits[pos]['x'];
                         map.start.y = map.exits[pos]['y'];
+
+                        for (var i = 0; i < map.monsters.length; i++) { 
+                            map.monsters[i].wait();
+                        }
+
 
                     } else {
                         
@@ -536,6 +628,40 @@
 
         };
 
+
+        var hiddenDoors = function(param) {
+            var door = new openDoors(param);
+            this.me = door.me;
+            this.me.current.x += 35;
+            this.me.current.y -= 30;
+
+            this.me.boundaries.top = -90;
+            this.me.boundaries.bottom = 30;
+            this.me.boundaries.left = 0;
+            this.me.boundaries.right = 0;
+
+            this.me.draw = function(ctx) {
+                
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                ctx.rect(this.current.x, this.current.y, this.width, this.height);
+                ctx.stroke();
+                ctx.beginPath();
+
+                this.drawBondaries(ctx);    
+            };
+
+            this.me.collision = function(object) {
+                
+                x1 = object.current.x; y1 = object.current.y; x2 = object.current.x + object.width; y2 = object.current.y + object.height;
+
+                if (this.hit(x1, y1, x2, y2) && (keyboard[40])) {
+                    keyboard = [];
+                    this.loadNewMap(object);
+                }
+            };
+
+        };
 
         var lockDoors = function(param) {
             this.me = new treasures(param);
@@ -776,9 +902,45 @@
                 }
             };
 
-
         };
 
+
+        var autoExit = function(param) {
+            var door = new openDoors(param);
+            
+            this.me = door.me;
+            this.me.current.x += 35;
+            this.me.current.y += 10;
+
+            this.me.boundaries.top = 25;
+            this.me.boundaries.bottom = -75;
+            this.me.boundaries.left = 0;
+            this.me.boundaries.right = 0;
+
+            this.me.draw = function(ctx) {
+                
+                
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                ctx.rect(this.current.x, this.current.y, this.width, this.height);
+                ctx.stroke();
+                ctx.beginPath();
+            
+
+                this.drawBondaries(ctx);    
+            };
+
+            this.me.collision = function(object) {
+                
+                x1 = object.current.x; y1 = object.current.y; x2 = object.current.x + object.width; y2 = object.current.y + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    keyboard = [];
+                    this.loadNewMap(object);
+                }
+            };
+
+        };
 
         var exit = function(param) {
             this.me = new treasures(param);
@@ -797,6 +959,7 @@
                     ctx.drawImage(this.img, 4*72, 4*72, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
                 }
 
+                ctx.save();
                 ctx.font = 'bold 18pt Comic Sans MS';
                 ctx.fillStyle = '#CFA67C';
                 ctx.strokeStyle = '#A06D3D';
@@ -805,6 +968,7 @@
                 ctx.textAlign="center";
                 ctx.strokeText('SORTIE', this.current.x + (this.width / 2)-1, this.current.y + (this.height / 2)-1, 58);
                 ctx.fillText('SORTIE', this.current.x + (this.width / 2), this.current.y + (this.height / 2), 58);
+                ctx.restore();
 
                 this.drawBondaries(ctx);    
             };
@@ -820,12 +984,7 @@
                 pause=true;
                 overlay.start(true);
 
-                //console.log(this.exit, map.exits);
-
-
                 setTimeout(function(door){ 
-                    
-                    //console.log(map.exits, door.exit);
 
                     if (loadedMap[map.exits[door.exit]['map']]) {
                         
@@ -833,12 +992,14 @@
                         map = loadedMap[map.exits[door.exit]['map']];
                         background = ctx.createPattern(img[map.background], "repeat"); 
 
-                        console.log(map.exits, pos);
-
                         object.current.x = map.exits[pos]['x'];
                         object.current.y = map.exits[pos]['y'];
                         map.start.x = map.exits[pos]['x'];
                         map.start.y = map.exits[pos]['y'];
+
+                        for (var i = 0; i < map.monsters.length; i++) { 
+                            map.monsters[i].wait();
+                        }
 
                     } else {
                         
@@ -873,19 +1034,153 @@
 
 
 
+        var movingPlatform =  function(param) {
+            ele = new elevators(param);
+            this.me = ele;
+
+            this.me.hitV = function(object) {
+
+                x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                 
+                    if (object.current.velY > 0 && object.current.y+object.height > this.current.y+this.boundaries.top) {
+
+                        object.current.y = this.current.y-object.height-this.boundaries.top-object.gravity-1;
+                        object.current.jumping = 0;
+                        object.current.grounding = 1;
+
+                        object.current.velY = 0;
+                    }
+
+                }
+            },
+
+            this.me.move = function() {
+
+                
+                x1 = mario.current.x; y1 = mario.current.y + mario.height; x2 = mario.current.x + mario.width;  y2 = mario.current.y + mario.height+5;
+                if (this.hit(x1, y1, x2, y2)) {
+                    if (mario.current.moving == 0) {
+                        mario.current.x += this.speed;
+                        mario.current.moving += this.speed;   
+                    }
+                    
+                } 
+                this.current.x += this.speed;
+                this.current.move -= this.speed;
+
+                if (Math.abs(this.current.move) >= (this.maxMove * 69) || this.current.move == 0) {
+
+                    this.speed = 0-this.speed;
+                }
 
 
 
+            }
+
+        };
 
 
-        var elevator =  function(param) {
+        var ladders = function(param) {
 
             this.trash = 0,
             this.width = 70,
             this.height = 70,
             this.img = img[2],
-            this.speed = -3,
+
+            this.current = {
+                'x' : param[1],
+                'y' : param[2],
+                'timer' : performance.now(),
+            },
+
+            this.boundaries = {
+                'left' : -2,
+                'right' : -2,
+                'top' : 0,
+                'bottom' : 0,
+            },
+
+
+            this.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.drawImage(this.img, 7*72, 2*72, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+
+                this.drawBondaries(ctx);
+            },
+
+            this.drawBondaries = function(ctx) {
+                if (show_bondaries && this.trash == 0) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x-this.boundaries.left, this.current.y-this.boundaries.top, this.width+this.boundaries.left+this.boundaries.right, this.height+this.boundaries.top+this.boundaries.bottom);
+                    ctx.stroke();
+                }                
+            },
+
+            this.hit = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                return !(
+                    (x1 > this.current.x+this.width+this.boundaries.right) ||
+                    (x2 < this.current.x-this.boundaries.left) ||
+                    (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                    (y2 < this.current.y-this.boundaries.top)
+                );
+            },
+
+  
+
+            this.hitV = function(object) {
+
+                x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height;
+
+                //if (this.hit(x1, y1, x2, y2)) {
+                 
+                    if (object.current.velY >= 0) {
+                        if (object.current.velY != 0) object.current.y = object.current.y - object.gravity;
+                        object.current.velY = 0;
+                        
+                        if (keyboard[40]) object.current.velY = 3;
+
+                        object.current.jumping = 0;
+                        object.current.grounding = 1;
+                        object.current.climbing = 1;
+                        
+                    }
+
+                    if (object.current.velY < 0) {
+                        object.current.jumping = 0;
+                        object.current.grounding = 1;
+                        object.current.climbing = 1;
+
+                    }
+
+                //}
+            },
+
+            this.collision = function(object) {
+                
+                x1 = object.previewX(); y1 = object.previewY(); x2 = object.previewX() + object.width; y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    this.hitV(object);
+                }
+            }
+        };
+
+
+        var elevators =  function(param) {
+
+            this.trash = 0,
+            this.width = 70,
+            this.height = 70,
+            this.img = img[2],
             this.maxMove = 4,
+            this.speed = param[3];
 
             this.current = {
                 'x' : param[1],
@@ -903,6 +1198,10 @@
 
             this.die = function() {
             },
+
+            this.wait = function() {
+            },
+
 
             this.draw = function(ctx) {
 

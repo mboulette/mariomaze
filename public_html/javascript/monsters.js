@@ -31,6 +31,9 @@
                 ],
             },
 
+            this.wait = function() {
+            },
+
             this.die = function() {
                 this.current.action = 'dead';
                 this.current.frame = 0;
@@ -232,7 +235,38 @@
                 this.current.action = 'dead';
                 this.current.frame = 0;
                 this.current.y += 1;
-                this.trash = 2;
+                this.trash = performance.now();
+
+               setTimeout(function(object){ 
+                    object.trash = 1;
+                }, 60000, this);
+
+            },
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+                posX = this.current.x;
+
+                if (this.current.speed < 0) {
+                    ctx.translate(board.width, 0);
+                    ctx.scale(-1, 1);
+                    posX = board.width - this.width - this.current.x;                     
+                }
+
+                if (this.trash > 1 && performance.now() - this.trash > 20000) {
+                    alpha = Math.round(  ((performance.now() - this.trash)-10000) / 10000);
+                    ctx.globalAlpha = 1-alpha/10;
+                }
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, posX, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
             },
 
             this.me.action = {
@@ -248,24 +282,40 @@
 
         var plants = function(param) {
 
-            tmp = new hitZone(['boxes', param[1]-35, param[2], 142, 70, 8, 14, 0]);
+            tmp = new hitZone(['boxes', param[1], param[2], 142, 70, 0, 0, 7]);
             map.obstacles.push(tmp);
 
+            param[1] += 35;
             param[2] += 2;
             this.me = new monsters(param);
             this.me.img = img[0];
             this.me.current.action = 'hide';
             this.me.width = 70;
             this.me.height = 0;
-            this.me.y = param[2];
             this.me.maxY = param[2];
             this.me.minY = param[2] - 140;
 
             this.me.boundaries = {
                 'left' : -4,
                 'right' : -6,
-                'top' : 0,
+                'top' : -10,
                 'bottom' : 0,
+            },
+
+
+            this.me.wait = function() {
+                
+                this.current.y = this.maxY;
+                this.height = 0;
+                this.current.frame = 0;
+                this.current.action = 'hide';
+                this.current.timer = performance.now();
+                this.trash = 2;
+
+                setTimeout(function(object){ 
+                    object.trash = 0;
+                }, 200, this);
+
             },
 
             this.me.die = function() {
@@ -366,10 +416,10 @@
 
         var breaths = function(param) {
 
-            tmp = new hitZone(['boxes', param[1]+1, param[2], 69, 70, 8, 1, 33]);
+            tmp = new hitZone(['boxes', param[1], param[2], 70, 70, 0, 2, 7]);
             map.obstacles.push(tmp);
 
-            param[2] += 20;
+            param[2] += 2;
             this.me = new monsters(param);
             this.me.img = img[0];
             this.me.current.action = 'burn';
@@ -383,10 +433,10 @@
             this.me.burnigTimer = performance.now();
 
             this.me.boundaries = {
-                'left' : -4,
-                'right' : -6,
-                'top' : 0,
-                'bottom' : 0,
+                'left' : -10,
+                'right' : -10,
+                'top' : -20,
+                'bottom' : 10,
             },
 
             this.me.die = function() {

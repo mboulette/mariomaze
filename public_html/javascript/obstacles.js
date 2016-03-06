@@ -113,3 +113,24 @@
         var boxes = function(param) {
             this.me = new hitZone(param);
         };
+
+        var boxesReverse = function(param) {
+            this.me = new hitZone(param);
+
+            this.me.draw = function(ctx) {
+
+                ctx.save();
+                ctx.translate(0, this.y + (this.height/2));
+                ctx.scale(1, -1);
+                ctx.translate(0, 0 - (this.y + (this.height/2)));
+                ctx.drawImage(img[this.spriteImg], this.spriteX*72, this.spriteY*72, this.width, this.height, this.x, this.y+this.choc, this.width, this.height);
+                ctx.restore();
+
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.x, this.y, this.width, this.height);
+                    ctx.stroke();
+                }
+            }
+        };

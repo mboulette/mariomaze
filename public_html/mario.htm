@@ -40,7 +40,7 @@
             'images/enemies_spritesheet.png',
             'images/enemies.png',
             'images/cave.jpg',
-            'images/super-mario-makertileset.png',
+            //'images/super-mario-makertileset.png',
         ];
 
         var createPattern = function(ctx, img, x, y, width, height) { 
@@ -192,16 +192,20 @@
 
         var player = function() {
 
-            this.ammos = 200,
+            this.invincible = false;
+            this.ammos = 0,
             this.lives = 3,
-            this.coins = 400,
-            this.keys = 2,
+            this.coins = 0,
+            this.keys = 0,
             this.width = 46,
             this.height = 90,
             this.speed = 5,
             this.leap = -15,
             this.gravity = 0.5,
             this.friction = 0.5,
+            this.countStars = 0;
+            this.invincibleTimer = performance.now();
+            this.dying = 0;
 
             this.current = {
                 'x'         : 0,
@@ -211,10 +215,12 @@
                 'running'   : 1,
                 'jumping'   : 0,
                 'grounding' : 0,
+                'climbing' : 0,
                 'action'    : 'wait',
                 'timer'     : performance.now(),
                 'frame'     : 0,
                 'face'      : 'right',
+                'moving'    : 0,
             },
 
             this.boundaries = {
@@ -232,7 +238,10 @@
                 'land'  : [[0, 100, 50], [290, 100, 50], 'wait' ],                                                                                          //Atterrir
                 'stoop' : [[280, 100, -1] ],                                                                                                                //se baisser
                 'getup' : [[0, 0, 200], 'wait'],                                                                                                            //se lever 
+                'throw' : [[630, 100, 20], [770, 100, 50], [910, 100, 20], [1050, 100, 50]],
 
+                'climbwait' : [[350, 100, -1]],
+                'climb' : [[350, 100, 100], [420, 100, 50], [490, 100, 100], [560, 100, 50]],
             },
 
             this.draw = function() {
@@ -242,12 +251,23 @@
                 x = this.action[this.current.action][this.current.frame][0];
                 y = this.action[this.current.action][this.current.frame][1];
 
+
+                if (this.dying == 1) {
+                    ctx.globalCompositeOperation = 'difference';
+                    x = this.action['fall'][1][0];
+                    y = this.action['fall'][1][1];
+                }
+
+
                 if ( (this.current.face == 'left') ) {
                     ctx.translate(this.current.x + (this.width/2), 0);
                     ctx.scale(-1, 1);
                     ctx.translate(0 - (this.current.x + (this.width/2)), 0);
                 }
-                
+
+                ctx.drawImage(img[0], x, y, 70, 100, this.current.x+this.boundaries.left, this.current.y+this.boundaries.top, 70, 100);
+
+
                 if (show_bondaries) {
 
                     ctx.beginPath();
@@ -257,9 +277,34 @@
                 }
                 
 
-                ctx.drawImage(img[0], x, y, 70, 100, this.current.x+this.boundaries.left, this.current.y+this.boundaries.top, 70, 100);
+                
 
                 ctx.restore();
+
+                if (this.invincible) {
+                    
+                    if (performance.now() - this.invincibleTimer > 50) {
+                        this.countStars++;
+                        if (this.countStars > 4) this.countStars = 0;
+                        this.invincibleTimer = performance.now();
+                    }
+
+                    //console.log(this.countStars);
+                    var rnd = Math.floor((Math.random() * 4) + 1);
+                    ctx.save();
+                    if (this.countStars % 2) ctx.globalCompositeOperation = 'color-burn';
+                    if ( (this.current.face == 'left') ) {
+                        ctx.translate(this.current.x + (this.width/2), 0);
+                        ctx.scale(-1, 1);
+                        ctx.translate(0 - (this.current.x + (this.width/2)), 0);
+                    }
+                    ctx.drawImage(img[0], x, y, 70, 100, this.current.x+this.boundaries.left, this.current.y+this.boundaries.top, 70, 100);
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.drawImage(img[0], (4+this.countStars)*72, 3*72, 70, 70, this.current.x-10, this.current.y+28+rnd, 70, 70);
+                    ctx.restore();
+                }
             },
 
             this.nextframe = function () {
@@ -290,17 +335,23 @@
 
             this.die = function () {
                 
-                keyboard = [];
-                this.current.velX = 0;
-                this.current.velY = 0;
-                this.lives--;
-                map.projectiles = [];
+                if (!this.invincible) {
+                                        
+                    keyboard = [];
+                    this.lives--;
+                    map.projectiles = [];
 
-                pause=true;
-                overlay.toogle();
+                    pause=true;
+                    mario.dying = 1;
+                    overlay.toogle();
 
+                    for (var i = 0; i < map.monsters.length; i++) { 
+                        map.monsters[i].wait();
+                    }
 
-            }
+                }
+
+            },
 
             this.move = function () {
 
@@ -319,6 +370,7 @@
                 this.current.y += this.current.velY;
 
                 if (this.current.y > map.height) {
+                    this.invincible = false;
                     this.die();
                 }
 
@@ -330,6 +382,7 @@
 
         var update = function() {
 
+            mario.current.moving = 0;
             for (var i = 0; i < map.monsters.length; i++) {
                 map.monsters[i].move();
             }
@@ -356,6 +409,8 @@
                 mario.ammos--;
                 keyboard[88] = false;
             }
+
+
 
             if (keyboard[40]) { //down arrow
                 next_action = 'stoop';
@@ -386,13 +441,27 @@
             if (keyboard[38] || keyboard[32]) { // up arrow or space
                 if (!mario.current.jumping && mario.current.grounding) {
                     mario.current.jumping = 1;
-                    mario.current.velY = mario.leap;
+                    if ( mario.current.climbing != 1)  {
+                        mario.current.velY = mario.leap;
+                    } else {
+                       mario.current.velY = -3; 
+                    }  
                 }
                 
             }
 
             if ( mario.current.grounding == 0) next_action = 'fall';
-            if ( mario.current.jumping == 1 && mario.current.velY < 0 ) next_action = 'jump';
+            if ( mario.current.jumping == 1 && mario.current.velY < 0) next_action = 'jump';
+
+            if ( mario.current.climbing == 1) {
+                //console.log(next_action);
+                if (next_action == 'wait') {
+                    next_action = 'climbwait';
+                } else {
+                   next_action = 'climb';
+                } 
+            }
+
 
             if (mario.current.action != next_action) {
                 mario.current.action = next_action;
@@ -407,6 +476,7 @@
         var collision = function() {
 
             mario.current.grounding = 0;
+            mario.current.climbing = 0;
 
             for (var i = 0; i < map.monsters.length; i++) {
                 map.monsters[i].collision(mario);
@@ -454,18 +524,24 @@
                 ctx.translate(0, Math.max((board.height/2) - mario.current.y, board.height-map.height));
             }
 
+
             map.draw();
-            if (!pause) mario.draw();
+            mario.draw();
+
 
             ctx.restore();
 
             drawFrame();
+
 
             overlay.draw();
 
         };
 
         var drawFrame = function() {
+
+            
+
 
             ctx.save();
             ctx.globalAlpha = 0.8;
@@ -533,9 +609,12 @@
                 this.start(true);
 
                 setTimeout(function(object){ 
+                    mario.current.velX = 0;
+                    mario.current.velY = 0;
                     mario.current.x = map.start.x;
                     mario.current.y = map.start.y;
-                    
+                    mario.dying = 0;
+
                     overlay.start(false);
                     pause=false;
 

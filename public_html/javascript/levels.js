@@ -68,6 +68,8 @@ var level = function() {
 
             this.loadMap = function(shema, start) {
 
+                //console.log(shema);
+
                 this.id = shema.id;
                 this.background = shema.background;
                 this.translation = shema.translation;
@@ -87,26 +89,11 @@ var level = function() {
 
                     for (x = 0; x < lines.length; x++) {
 
-                        //console.log(lines[x], x, y);
-
-                        if (lines[x][0] == 'E') {
-                            
-                            if (!this.exits[lines[x]]) {
-                                this.exits[lines[x]] = {'x' : x*69+1, 'y' : y*69 };
-                            } else  {
-                                this.exits[lines[x]]['x'] = x*69;
-                                this.exits[lines[x]]['y'] = y*69;
-                            }
-                        }
-
-                        if (lines[x] == start) {
-                            this.start.x = x*69+1;
-                            this.start.y = y*69+1;
-                            mario.current.x = x*69+1;
-                            mario.current.y = y*69+1;
-                        }
-
+                        console.log(this.exits);
                         
+
+                        if (lines[x][0] == 'E'  && !this.exits[lines[x]] ) this.exits[lines[x]] = {'x' : x*69+1, 'y' : y*69+1 };
+
 
                         module = level_modules[lines[x]];
 
@@ -147,10 +134,30 @@ var level = function() {
 
                                 if (x*69 + tmp.width > this.width) this.width = x*69 + tmp.width;
                                 if (y*69 + tmp.height > this.height) this.height = y*69 +tmp.height;
+
+                                if( lines[x][0] == 'E' ) {
+                                    this.exits[lines[x]]['x'] = tmp.current.x;
+                                    this.exits[lines[x]]['y'] = tmp.current.y;
+                                }
+
+                                if (lines[x] == start) {
+                                    this.start.x = this.exits[lines[x]]['x'];
+                                    this.start.y = this.exits[lines[x]]['y'];
+                                    mario.current.x = this.exits[lines[x]]['x'];
+                                    mario.current.y = this.exits[lines[x]]['y'];
+                                }
+
+
+
                             }
                         }
+                         
 
+    
+                            
                     }
+
+
 
                     if (plate) {
                         tmp = new window[plate.define[0]](plate.define);
@@ -182,8 +189,13 @@ var level = function() {
             '__' : {'groupe' : 'obstacles', 'define' : ['platforms', 0, 0, 70, 70, 2, 11, 2]},
             '_>' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 11, 01]},
             '_ ' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 4, 11]},
-            'T0' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 8, 14, 0]},
-            '0T' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 8, 15, 0]},
+            'T0' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 0, 0, 7]},
+            '0T' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 0, 1, 7]},
+            'T2' : {'groupe' : 'obstacles', 'define' : ['boxesReverse', 0, 0, 70, 70, 0, 0, 7]},
+            '2T' : {'groupe' : 'obstacles', 'define' : ['boxesReverse', 0, 0, 70, 70, 0, 1, 7]},
+            'T1' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 142, 70, 0, 0, 8]},
+            '1T' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 0, 1, 8]},
+            'XX' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 0, 11]},
 
             '- ' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 8, 12]},
 
@@ -191,7 +203,10 @@ var level = function() {
 
             ' |' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 15, 15]},
             '| ' : {'groupe' : 'obstacles', 'define' : ['boxes', 0, 0, 70, 70, 2, 15, 15]},
-            'oo' : {'groupe' : 'monsters',  'define' : ['elevator', 0, 0]},
+            'oo' : {'groupe' : 'monsters',  'define' : ['elevators', 0, 0, -3]},
+            'xx' : {'groupe' : 'monsters',  'define' : ['movingPlatform', 0, 0, -2]},
+            'xz' : {'groupe' : 'monsters',  'define' : ['movingPlatform', 0, 0, 2]},
+            'zx' : {'groupe' : 'monsters',  'define' : ['movingPlatform', 0, 0, 3]},
 
             '##' : {'groupe' : 'obstacles', 'define' : ['brickwall', 0, 0]},
             '#1' : {'groupe' : 'obstacles', 'define' : ['decorations', 0, 0, 70, 70, 2, 10, 12]},
@@ -205,6 +220,7 @@ var level = function() {
 
 
             '? ' : {'groupe' : 'obstacles', 'define' : ['surprises', 0, 0]},
+            '?1' : {'groupe' : 'obstacles', 'define' : ['surpriseBlock', 0, 0]},
             '$ ' : {'groupe' : 'items',     'define' : ['coins', 0, 0]},
             '$$' : {'groupe' : 'items',     'define' : ['diamons', 0, 0]},
             '$1' : {'groupe' : 'obstacles', 'define' : ['shopLives', 0, 0]},
@@ -212,7 +228,8 @@ var level = function() {
             '$3' : {'groupe' : 'obstacles', 'define' : ['shopAmmos', 0, 0]},
             '! ' : {'groupe' : 'items',     'define' : ['hiddenBlock', 0, 0, 2, 11, 2]},
             '♥ ' : {'groupe' : 'items',     'define' : ['hearts', 0, 0]},
-            '* ' : {'groupe' : 'items',     'define' : ['ammos', 0, 0]},
+            '@ ' : {'groupe' : 'items',     'define' : ['ammos', 0, 0]},
+            '* ' : {'groupe' : 'items',     'define' : ['stars', 0, 0]},
             'i ' : {'groupe' : 'items',     'define' : ['torches', 0, 0]},
             '+ ' : {'groupe' : 'items',     'define' : ['keys', 0, 0]},
             'S1' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 7, 4]},
@@ -222,13 +239,19 @@ var level = function() {
             'E1' : {'groupe' : 'items',     'define' : ['openDoors', 0, 0, 'E1']},
             'E2' : {'groupe' : 'items',     'define' : ['lockDoors', 0, 0, 'E2']},
             'E3' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 15, 15]},
+            'E4' : {'groupe' : 'items',     'define' : ['hiddenDoors', 0, 0, 'E4']},
+            'E5' : {'groupe' : 'items',     'define' : ['hiddenDoors', 0, 0, 'E5']},
+            'E6' : {'groupe' : 'items',     'define' : ['autoExit', 0, 0, 'E6']},
+            'E7' : {'groupe' : 'items',     'define' : ['autoExit', 0, 0, 'E7']},
             'E>' : {'groupe' : 'items',     'define' : ['exit', 0, 0, 'E>']},
             'E<' : {'groupe' : 'items',     'define' : ['exit', 0, 0, 'E<']},
 
             'M1' : {'groupe' : 'monsters',  'define' : ['snails', 0, 0]},
             'M2' : {'groupe' : 'monsters',  'define' : ['rats', 0, 0]},
             'M3' : {'groupe' : 'monsters',  'define' : ['plants', 0, 0]},
-            'M4' : {'groupe' : 'monsters',  'define' : ['breaths', 0, 0]}
+            'M4' : {'groupe' : 'monsters',  'define' : ['breaths', 0, 0]},
+
+            'HH' : {'groupe' : 'items', 'define' : ['ladders', 0, 0, 70, 70, 2, 7, 2]},
         };
 
         var maps = {
@@ -307,25 +330,59 @@ var level = function() {
 
             3 : {
                 'id' : 3,
-                'name' : 'Carte #3',
+                'name' : 'Carte #2',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
-                "exits" : {'E<' : {'map' : 1, 'pos' :  'E3'}},
+                "exits" : {
+                    'E<' : {'map' : 1, 'pos' :  'E3'} ,
+                    'E4' : {'map' : 4, 'pos' :  'E6'},
+                    'E5' : {'map' : 4, 'pos' :  'E7'},
+                },
                 'plan' : [
-                    "|                                                                      |",
-                    "|                                                           F          |",
-                    "|                                                       #2  #2  #2     |",
-                    "|                                                       #1#1#1#1#1     |",
-                    "|                                                       #1W##1W##1     |",
-                    "|                                                     _ #1_ #1_ #1_    |",
-                    "|                                                     [][][][][][][]   |",
-                    "|                                                     S1S1S1S1[][][]   |",
-                    "                                                      S1S1S1E2[][][]   |",
-                    "E<E3      M3    M4                              <=======================",
-                    "======================================                                 |",
+                    "|                               $ $ $ $                                  |",
+                    "|                                                                        |",
+                    "|                               ##?1####                                 |",
+                    "|                                                             F          |",
+                    "|                   $             M1                      #2  #2  #2     |",
+                    "|         ?     $ $             <======>                  #1#1#1#1#1     |",
+                    "|           $ $                                           #1W##1W##1     |",
+                    "|         $               M1                            _ #1_ #1_ #1_    |",
+                    "|         ##            <======>                        [][][][][][][]   |",
+                    "|                                 =                     S1S1S1S1[][][]+  |",
+                    "|                                                       S1S1S1E2[][][]XXXX",
+                    "|                               xzxz              <===HH==================",
+                    "|                                                     HH                 |",
+                    "|                         xxxx                        HH        $        |",
+                    "|       E4                                            HH  E5    $        |",
+                    "        M3                                            HH  T00T           |",
+                    "E<E3    T1                                            <========>         |",
+                    "=============>                                                           |",
 
                     ]
 
+            },
+
+            4 : {
+                'id' : 4,
+                'name' : 'Carte #2.1',
+                'translation' : {'x' : 0, 'y' : 0},
+                'background' : 7,
+                "exits" : {
+                    'E6' : {'map' : 3, 'pos' :  'E4'},
+                    'E7' : {'map' : 3, 'pos' :  'E5'},
+                },
+                'plan' : [
+                    "[][][][]T11T[][][][][][][][][][][][][][][][][][][][][][]T11T[][][][]",
+                    "[][][][]T11T[][][][][][][][][][][][][][][][][][][][][][]T11T[][][][]",
+                    "[][]    T22T              [][][][][][][][][]            T22T    [][]",
+                    "[]      E6                  [][][][][][][]              E7        []",
+                    "[]                                                                []",
+                    "[]              ?             i   *   i         $ $ $ $ $ $ $ $   []",
+                    "[]                                                                []",
+                    "[]      []                  [][][]M4[][][]              []        []",
+                    "[][]    M2      M2        [][][][][][][][][]  M2  M2            [][]",
+                    "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
+                    ]
             },
 
         };
