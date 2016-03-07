@@ -613,7 +613,7 @@
                 
                 x1 = object.current.x; y1 = object.current.y; x2 = object.current.x + object.width; y2 = object.current.y + object.height;
 
-                if (this.hit(x1, y1, x2, y2) && (keyboard[90] || keyboard[40])) {
+                if (this.hit(x1, y1, x2, y2) && (keyboard[38] || keyboard[40])) {
                     
                     keyboard = [];
 
@@ -684,7 +684,7 @@
                 
                 x1 = object.current.x; y1 = object.current.y; x2 = object.current.x + object.width; y2 = object.current.y + object.height;
 
-                if (this.hit(x1, y1, x2, y2)  && (keyboard[90] || keyboard[40]) && object.keys > 0) {
+                if (this.hit(x1, y1, x2, y2)  && (keyboard[38] || keyboard[40]) && object.keys > 0) {
                     
                     keyboard = [];
 

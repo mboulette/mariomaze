@@ -47,7 +47,7 @@
                     object.width += 10;
                     object.trash = 0;
 
-                }, 5000, this);
+                }, 10000, this);
             },
 
             this.draw = function(ctx) {

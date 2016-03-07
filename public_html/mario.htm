@@ -23,8 +23,8 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
-        var startMap = 1;
-        var startPos = 'E0';
+        var startMap = 3;
+        var startPos = 'E5';
         var pause = false;
         var loadedMap = [];
         var board;
@@ -42,6 +42,7 @@
             'images/enemies_spritesheet.png',
             'images/enemies.png',
             'images/cave.jpg',
+            'images/castle.jpg',
             //'images/super-mario-makertileset.png',
         ];
 
@@ -198,11 +199,11 @@
             this.ammos = 0,
             this.lives = 3,
             this.coins = 0,
-            this.keys = 0,
+            this.keys = 2,
             this.width = 46,
             this.height = 90,
             this.speed = 5,
-            this.leap = -15,
+            this.leap = -14,
             this.gravity = 0.5,
             this.friction = 0.5,
             this.countStars = 0;
@@ -417,32 +418,32 @@
             }
 
             if (keyboard[18] || keyboard[90]) { // alt
-                mario.running = 1 + (3/5);
+                mario.current.running = 1 + (3/5);
             } else {
-                mario.running = 1;
+                mario.current.running = 1;
             }
 
             if (keyboard[39]) { // right arrow
-                if (mario.current.velX < mario.speed * mario.running) {
+                if (mario.current.velX < mario.speed * mario.current.running) {
                     mario.current.velX++;
                 }
                 next_action = 'walk';
-                if (mario.running > 1) next_action = 'run';
+                if (mario.current.running > 1) next_action = 'run';
             }
 
             if (keyboard[37]) { // left arrow
-                if (mario.current.velX > -mario.speed * mario.running) {
+                if (mario.current.velX > -mario.speed * mario.current.running) {
                     mario.current.velX--;
                 }
                 next_action = 'walk';
-                if (mario.running > 1) next_action = 'run';
+                if (mario.current.running > 1) next_action = 'run';
             }
 
             if (keyboard[38] || keyboard[32] || keyboard[88]) { // up arrow or space
                 if (!mario.current.jumping && mario.current.grounding) {
                     mario.current.jumping = 1;
                     if ( mario.current.climbing != 1)  {
-                        mario.current.velY = mario.leap;
+                        mario.current.velY = mario.leap - mario.current.running;
                     } else {
                        mario.current.velY = -3; 
                     }  
