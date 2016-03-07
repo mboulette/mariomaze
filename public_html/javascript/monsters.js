@@ -103,6 +103,8 @@
                 if (this.hit(x1, y1, x2, y2)) {
 
                     object.die();
+
+                    if (object.invincible) this.die(); 
                 }
             },
 
@@ -110,8 +112,6 @@
                 
                 turn = false;
                 for (var i = 0; i < map.obstacles.length; i++) {
-                    
-
 
                     if (map.obstacles[i].hit) {
 

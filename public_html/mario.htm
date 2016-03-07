@@ -23,13 +23,15 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
+        var startMap = 1;
+        var startPos = 'E0';
         var pause = false;
         var loadedMap = [];
         var board;
         var ctx;
         var background;
         var keyboard = [];
-        var show_bondaries = true;
+        var show_bondaries = false;
         var pattern = [];
         var img = [
             'images/mario.png',
@@ -61,7 +63,7 @@
         var loadImg = function myself (img_id) {
             if (img_id >= img.length) {
 
-                map.loadMap(maps[3], 'E3');
+                map.loadMap(maps[startMap], startPos);
                 main();
 
             } else {
@@ -235,7 +237,7 @@
                 'run'   : [[0, 0, 20], [70, 0, 20], [140, 0, 20], [210, 0, 20], [280, 0, 20], [350, 0, 20], [420, 0, 20], [350, 0, 20] ],                   //courrir
                 'jump'  : [[0, 100, 50], [70, 100, 1000], 'fall'],                                                                                          //sauter
                 'fall'  : [[0, 0, 100], [210, 101, -1] ],                                                                                                   //tomber
-                'land'  : [[0, 100, 50], [290, 100, 50], 'wait' ],                                                                                          //Atterrir
+                'land'  : [[0, 100, 100], [290, 100, 100], 'wait' ],                                                                                          //Atterrir
                 'stoop' : [[280, 100, -1] ],                                                                                                                //se baisser
                 'getup' : [[0, 0, 200], 'wait'],                                                                                                            //se lever 
                 'throw' : [[630, 100, 20], [770, 100, 50], [910, 100, 20], [1050, 100, 50]],
@@ -395,7 +397,7 @@
 
             next_action = 'wait';
 
-            if (keyboard[88] && mario.ammos > 0) { //x (shoot)
+            if (keyboard[67] && mario.ammos > 0) { //x (shoot)
 
                 stoop = (keyboard[40]) ? 20 : 0;
 
@@ -407,10 +409,8 @@
 
                 map.projectiles.push(tmp);
                 mario.ammos--;
-                keyboard[88] = false;
+                keyboard[67] = false;
             }
-
-
 
             if (keyboard[40]) { //down arrow
                 next_action = 'stoop';
@@ -438,7 +438,7 @@
                 if (mario.running > 1) next_action = 'run';
             }
 
-            if (keyboard[38] || keyboard[32]) { // up arrow or space
+            if (keyboard[38] || keyboard[32] || keyboard[88]) { // up arrow or space
                 if (!mario.current.jumping && mario.current.grounding) {
                     mario.current.jumping = 1;
                     if ( mario.current.climbing != 1)  {
@@ -482,12 +482,12 @@
                 map.monsters[i].collision(mario);
             }
 
-            for (var i = 0; i < map.items.length; i++) {
-                map.items[i].collision(mario);
-            }
-
             for (var i = 0; i < map.obstacles.length; i++) {
                 map.obstacles[i].collision(mario);
+            }
+
+            for (var i = 0; i < map.items.length; i++) {
+                map.items[i].collision(mario);
             }
         };
 
@@ -540,22 +540,16 @@
 
         var drawFrame = function() {
 
-            
-
-
             ctx.save();
             ctx.globalAlpha = 0.8;
 
-            
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.rect(0, 0, board.width, 30);
             ctx.stroke();
             ctx.fill();
-            
-
-            
+                        
             ctx.font = '14pt Comic Sans MS';
             ctx.fillStyle = '#FFFFFF';//'rgba(255, 255, 255, 1)';
             ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
@@ -684,6 +678,8 @@
 
             $(document).on('keydown', function (e) {
                 keyboard[e.which] = true;
+
+                //console.log(e.which);
 
                 if (e.which == '80') {
                     pause = !pause;

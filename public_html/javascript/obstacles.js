@@ -22,13 +22,17 @@
 
                 if (this.hit(x1, y1, x2, y2)) {
 
-                    if (object.current.velX > 0) {
-                        object.current.x = this.x-object.width-1;
+                    x1 = object.current.x - (this.x-object.width-1);
+                    x2 = object.current.x - (this.x+this.width+1);
+
+                    if (object.current.velX != 0) {
+                        if ( Math.abs(x1) > Math.abs(x2) ) {
+                            object.current.x -= x2;
+                        } else { 
+                            object.current.x -= x1;
+                        }
                     }
 
-                    if (object.current.velX < 0) {
-                        object.current.x = this.x+this.width+1;
-                    }
 
                     object.current.velX = 0;
 
@@ -41,7 +45,7 @@
 
                 if (this.hit(x1, y1, x2, y2)) {
                  
-                    if (object.current.velY > 0) {
+                    if (object.current.velY > 0 ) {
                         object.current.y = this.y-object.height-object.gravity-1;
                         object.current.jumping = 0;
                         object.current.grounding = 1;

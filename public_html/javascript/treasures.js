@@ -575,8 +575,6 @@
                 overlay.start(true);
                 setTimeout(function(door){ 
 
-                    console.log(map.exits);
-
                     if (loadedMap[map.exits[door.exit]['map']]) {
                         
                         pos = map.exits[door.exit]['pos'];
@@ -642,11 +640,13 @@
 
             this.me.draw = function(ctx) {
                 
-                ctx.beginPath();
-                ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
-                ctx.rect(this.current.x, this.current.y, this.width, this.height);
-                ctx.stroke();
-                ctx.beginPath();
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                    ctx.rect(this.current.x, this.current.y, this.width, this.height);
+                    ctx.stroke();
+                    ctx.beginPath();
+                }
 
                 this.drawBondaries(ctx);    
             };
@@ -919,13 +919,13 @@
 
             this.me.draw = function(ctx) {
                 
-                
-                ctx.beginPath();
-                ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
-                ctx.rect(this.current.x, this.current.y, this.width, this.height);
-                ctx.stroke();
-                ctx.beginPath();
-            
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                    ctx.rect(this.current.x, this.current.y, this.width, this.height);
+                    ctx.stroke();
+                    ctx.beginPath();
+                }
 
                 this.drawBondaries(ctx);    
             };
@@ -1096,10 +1096,10 @@
             },
 
             this.boundaries = {
-                'left' : -2,
-                'right' : -2,
-                'top' : 0,
-                'bottom' : 0,
+                'left' : -20,
+                'right' : -20,
+                'top' : -5,
+                'bottom' : -5,
             },
 
 
@@ -1132,12 +1132,29 @@
                 );
             },
 
-  
+            /*
+            this.hitV = function(object) {
+
+                x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height + this.speed;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                 
+                    if (object.current.velY > 0 && object.current.y+object.height > this.current.y+this.boundaries.top) {
+
+                        object.current.y = this.current.y-object.height-this.boundaries.top-object.gravity-1;
+                        object.current.jumping = 0;
+                        object.current.grounding = 1;
+
+                        object.current.velY = 0;
+                    }
+
+                }
+            },
+            */
 
             this.hitV = function(object) {
 
-                x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height;
-
+                //x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height;
                 //if (this.hit(x1, y1, x2, y2)) {
                  
                     if (object.current.velY >= 0) {
@@ -1170,6 +1187,57 @@
                     this.hitV(object);
                 }
             }
+        };
+
+
+        var laddersEnd =  function(param) {
+
+            tmp = new ladders(['ladders', param[1], param[2]+5, 70, 70, 2, 7, 2]);
+            map.items.push(tmp);
+
+            tmp = new decorations(['decorations', param[1], param[2], 70, 70, 2, 7, 7]);
+            map.obstacles.push(tmp);
+
+            ele = new elevators(param);
+            this.me = ele;
+
+            this.me.current.y -= 60;
+
+            this.me.boundaries = {
+                'left' : -2,
+                'right' : -2,
+                'top' : -60,
+                'bottom' : -2,
+            },
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.drawImage(this.img, 72*7, 72*1, this.width, 30, this.current.x, this.current.y+40, this.width, 30);
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.hitV = function(object) {
+
+                x1 = object.current.x; y1 = object.previewY() + object.height; x2 = object.current.x + object.width;  y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                 
+                    if (object.current.velY > 0 && object.current.y+object.height > this.current.y+this.boundaries.top) {
+
+                        object.current.y = this.current.y-object.height-this.boundaries.top-object.gravity-1;
+                        object.current.jumping = 0;
+                        object.current.grounding = 1;
+
+                        object.current.velY = 0;
+                    }
+
+                }
+            }
+
+
         };
 
 
@@ -1256,7 +1324,7 @@
                 
                 x1 = object.previewX(); y1 = object.previewY(); x2 = object.previewX() + object.width; y2 = object.previewY() + object.height;
 
-                if (this.hit(x1, y1, x2, y2)) {
+                if (this.hit(x1, y1, x2, y2) && !keyboard[40]) {
                     this.hitV(object);
                 }
             },

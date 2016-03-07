@@ -89,7 +89,7 @@ var level = function() {
 
                     for (x = 0; x < lines.length; x++) {
 
-                        console.log(this.exits);
+                        //console.log(this.exits);
                         
 
                         if (lines[x][0] == 'E'  && !this.exits[lines[x]] ) this.exits[lines[x]] = {'x' : x*69+1, 'y' : y*69+1 };
@@ -136,8 +136,8 @@ var level = function() {
                                 if (y*69 + tmp.height > this.height) this.height = y*69 +tmp.height;
 
                                 if( lines[x][0] == 'E' ) {
-                                    this.exits[lines[x]]['x'] = tmp.current.x;
-                                    this.exits[lines[x]]['y'] = tmp.current.y;
+                                    this.exits[lines[x]]['x'] = tmp.current.x+1;
+                                    this.exits[lines[x]]['y'] = tmp.current.y+1;
                                 }
 
                                 if (lines[x] == start) {
@@ -252,6 +252,7 @@ var level = function() {
             'M4' : {'groupe' : 'monsters',  'define' : ['breaths', 0, 0]},
 
             'HH' : {'groupe' : 'items', 'define' : ['ladders', 0, 0, 70, 70, 2, 7, 2]},
+            'H1' : {'groupe' : 'items', 'define' : ['laddersEnd', 0, 0]},
         };
 
         var maps = {
@@ -350,7 +351,7 @@ var level = function() {
                     "|         ##            <======>                        [][][][][][][]   |",
                     "|                                 =                     S1S1S1S1[][][]+  |",
                     "|                                                       S1S1S1E2[][][]XXXX",
-                    "|                               xzxz              <===HH==================",
+                    "|                               xzxz              <===H1==================",
                     "|                                                     HH                 |",
                     "|                         xxxx                        HH        $        |",
                     "|       E4                                            HH  E5    $        |",
