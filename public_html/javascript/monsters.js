@@ -279,6 +279,64 @@
             }
         };
 
+        var bats = function(param) {
+            this.me = new monsters(param);
+
+            this.me.current.speed = 8 + Math.floor(Math.random() * 3);
+            this.me.framerate = 50,
+            this.me.img = img[0];
+            this.me.width = 70;
+            this.me.height = 70;
+
+            this.me.die = function() {
+                this.current.action = 'dead';
+                this.current.frame = 0;
+                this.current.y += 1;
+                this.trash = performance.now();
+
+               setTimeout(function(object){ 
+                    object.trash = 1;
+                }, 60000, this);
+
+            },
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+                posX = this.current.x;
+
+                if (this.current.speed < 0) {
+                    ctx.translate(board.width, 0);
+                    ctx.scale(-1, 1);
+                    posX = board.width - this.width - this.current.x;                     
+                }
+
+                if (this.trash > 1 && performance.now() - this.trash > 20000) {
+                    alpha = Math.round(  ((performance.now() - this.trash)-10000) / 10000);
+                    ctx.globalAlpha = 1-alpha/10;
+                }
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, posX, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.action = {
+                'walk' : [
+                     [4*72, 4*72, this.me.framerate*2], [6*72, 4*72, this.me.framerate*2],
+                ],
+                'dead' : [
+                     [203, 206, -1],
+                ],
+            }
+        };
+
+
 
         var plants = function(param) {
 
