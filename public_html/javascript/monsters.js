@@ -286,18 +286,27 @@
             this.me.framerate = 50,
             this.me.img = img[0];
             this.me.width = 70;
-            this.me.height = 70;
+            this.me.height = 40;
+            this.me.current.action = 'fly';
+            this.me.current.speed = 3 + Math.floor(Math.random() * 3);;
+            this.me.current.y = param[2] + 30;
 
             this.me.die = function() {
                 this.current.action = 'dead';
                 this.current.frame = 0;
-                this.current.y += 1;
-                this.trash = performance.now();
+                this.trash = 2;
 
-               setTimeout(function(object){ 
+                setTimeout(function(object){ 
                     object.trash = 1;
-                }, 60000, this);
+                }, 2000, this);
 
+            },
+
+            this.me.boundaries = {
+                'left' : -4,
+                'right' : -4,
+                'top' : -4,
+                'bottom' : 0,
             },
 
             this.me.draw = function(ctx) {
@@ -327,13 +336,107 @@
             },
 
             this.me.action = {
-                'walk' : [
+                'fly' : [
                      [4*72, 4*72, this.me.framerate*2], [6*72, 4*72, this.me.framerate*2],
                 ],
                 'dead' : [
-                     [203, 206, -1],
+                     [7*72, 4*72, -1],
                 ],
+            },
+
+
+            this.me.script = function() {
+
+                if (this.trash != 0) {
+                    this.current.x -= (this.current.speed/2);
+                    this.current.y += Math.abs(this.current.speed*3);
+                    return
+                };
+                
+
+                for (var i = 0; i < map.obstacles.length; i++) {
+
+                    if (map.obstacles[i].hit) {
+
+                        //Une chance sur 5 de changer de direction aléatoirement
+                        /*
+                        var change = Math.floor(Math.random() * 1000);
+                        console.log(change);
+                        if (change == 1) this.current.speed = 0-this.current.speed;
+                        */
+
+
+                        x = (typeof map.obstacles[i].x !== "undefined") ? map.obstacles[i].x : map.obstacles[i].current.x;
+                        y = (typeof map.obstacles[i].y !== "undefined") ? map.obstacles[i].y : map.obstacles[i].current.y;
+
+                        if (map.obstacles[i].hit(
+                            this.current.x - this.boundaries.left, 
+                            this.current.y - this.boundaries.top, 
+                            this.current.x+this.width + this.boundaries.right, 
+                            this.current.y+this.height + this.boundaries.bottom
+                            )) {
+
+                            //console.log(this.current.speed);
+                            if (this.current.speed > 0) {
+                                this.current.x = x+map.obstacles[i].width+this.current.speed; 
+                            } else {
+                                this.current.x = x-this.width+this.current.speed;
+                            }
+                            this.current.speed = 0-this.current.speed;
+                            break;
+
+                        }
+  
+                    }
+                }
+
+                this.current.x -= this.current.speed;
+
+            },
+
+
+            this.me.collision = function(object) {
+
+                if (this.trash != 0) return;
+                
+                x1 = object.previewX();
+                y1 = object.previewY();
+                x2 = object.previewX() + object.width;
+                y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2) && object.current.action != 'stoop') {
+
+                    object.die();
+
+                    if (object.invincible) this.die(); 
+                }
+            },
+
+            this.me.move = function() {
+
+                this.script();
+
+                if (this.trash != 0) return;
+
+                if ((performance.now() - this.current.timer) >this.action[this.current.action][this.current.frame][2]) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                        this.current.y -= 10;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                        this.current.y += 10;
+                    }
+                    
+                    this.current.timer = performance.now();
+
+                }
             }
+
+
         };
 
 

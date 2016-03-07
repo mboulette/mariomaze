@@ -23,8 +23,8 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
-        var startMap = 3;
-        var startPos = 'E5';
+        var startMap = 5;
+        var startPos = 'E1';
         var pause = false;
         var loadedMap = [];
         var board;
@@ -196,7 +196,7 @@
         var player = function() {
 
             this.invincible = false;
-            this.ammos = 0,
+            this.ammos = 100,
             this.lives = 3,
             this.coins = 0,
             this.keys = 2,
