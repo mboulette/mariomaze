@@ -82,7 +82,7 @@
         };
 
 
-        var fireball = function(x, y, dir) {
+        var fireAmmo = function(x, y, dir) {
 
             this.trash = 0;
             this.gravity = 2,
@@ -403,9 +403,9 @@
                 stoop = (keyboard[40]) ? 20 : 0;
 
                 if (mario.current.face == 'right') { 
-                    var tmp = new fireball(mario.current.x+mario.width, mario.current.y+20+stoop, 1);
+                    var tmp = new fireAmmo(mario.current.x+mario.width, mario.current.y+20+stoop, 1);
                 } else {
-                    var tmp = new fireball(mario.current.x, mario.current.y+20+stoop, -1);
+                    var tmp = new fireAmmo(mario.current.x, mario.current.y+20+stoop, -1);
                 }
 
                 map.projectiles.push(tmp);

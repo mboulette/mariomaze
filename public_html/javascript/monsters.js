@@ -573,6 +573,118 @@
 
         };
 
+        
+        var breathsReverse = function(param) {
+
+            
+            tmp = new hitZoneR(['boxes', param[1], param[2], 70, 70, 0, 2, 7]);
+            map.obstacles.push(tmp.me);
+            
+
+            param[2] += 68;
+            this.me = new monsters(param);
+            this.me.img = img[0];
+            this.me.current.action = 'burn';
+            this.me.current.speed = 10;
+            this.me.width = 70;
+            this.me.height = 0;
+            this.me.y = param[2];
+            this.me.maxY = param[2] + 140;
+            this.me.minY = param[2];
+            this.me.burning = 0;
+            this.me.burnigTimer = performance.now();
+
+            this.me.boundaries = {
+                'left' : -10,
+                'right' : -10,
+                'top' : 10,
+                'bottom' : -20,
+            },
+
+            this.me.die = function() {
+
+            },
+
+            this.me.action = {
+                'burn' : [
+                     [5*72, 5*72, 75],
+                     [6*72, 5*72, 75],
+                     [7*72, 5*72, 75],
+                     [8*72, 5*72, 75],
+                ],
+            }
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                ctx.translate(this.current.x + (this.width/2), this.current.y + (this.height/2));
+                ctx.scale(1, -1);
+                ctx.translate(0 - (this.current.x + (this.width/2)), 0 - (this.current.y + (this.height/2)) );
+
+                ctx.drawImage(this.img, x, y+140, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.script = function() {
+                
+                if (this.burning == 1) {
+                    if (this.current.y > this.minY) {
+                        this.current.y -= this.current.speed;
+                        this.height += this.current.speed;
+                    }
+
+                    if (performance.now() - this.burnigTimer > 5000) {
+                        this.burning = 0;
+                        this.burnigTimer = performance.now();
+                    }
+
+                }
+                if (this.burning == 0) {
+                    if (this.current.y < this.maxY) {
+                        this.current.y += this.current.speed;
+                        this.height -= this.current.speed;
+                    }
+
+                    if (performance.now() - this.burnigTimer > 2000) {
+                        this.burning = 1;
+                        this.burnigTimer = performance.now();
+                    }
+                }
+
+
+            },
+
+            this.me.move = function() {
+
+                if (this.trash != 0) return;
+
+                this.script();
+
+                if ((performance.now() - this.current.timer) >this.action[this.current.action][this.current.frame][2]) {
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+                    this.current.timer = performance.now();
+
+                }
+
+            }  
+
+
+        };
 
 
         var breaths = function(param) {
@@ -678,5 +790,323 @@
 
             }  
 
+
+        };
+
+
+
+
+        var lavas = function(param) {
+
+            this.me = new monsters(param);
+            this.me.img = img[0];
+            this.me.current.action = 'burn';
+            this.me.width = 70;
+            this.me.height = 70;
+            this.me.burning = 0;
+            this.me.burnigTimer = performance.now();
+            this.me.fireball = Math.floor(Math.random() * 3) + 1;
+
+            this.me.boundaries = {
+                'left' : 0,
+                'right' : 0,
+                'top' : -20,
+                'bottom' : 0,
+            },
+
+            this.me.die = function() {
+
+            },
+
+            this.me.action = {
+                'burn' : [
+                     [5*72, 7*72, 200],
+                     [6*72, 7*72, 200],
+                     [7*72, 7*72, 200],
+                     [8*72, 7*72, 200],
+
+                     [5*72, 7*72, 200],
+                     [6*72, 7*72, 200],
+                     [7*72, 7*72, 200],
+                     [8*72, 7*72, 200],
+
+                ]
+
+            }
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                if (this.current.frame%2 == 0) {
+                    ctx.translate(this.current.x + (this.width/2), 0);
+                    ctx.scale(-1, 1);
+                    ctx.translate(0 - (this.current.x + (this.width/2)), 0);                     
+                }
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.me.script = function() {
+
+                if ((performance.now() - this.burnigTimer) > (this.fireball*3000)) {
+
+                    var tmp = new fireball(['fireball', this.current.x, this.current.y]);
+                    map.monsters.push(tmp);
+
+                    this.burnigTimer = performance.now();
+                }
+                
+            },
+
+            this.me.move = function() {
+
+                if (this.trash != 0) return;
+
+                this.script();
+
+                if ((performance.now() - this.current.timer) > this.action[this.current.action][this.current.frame][2]) {
+
+                    
+
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+                    this.current.timer = performance.now();
+
+                }
+
+            }  
+
+
+        };
+
+
+
+
+
+        var fireball =  function(param) {
+
+            this.trash = 0,
+            this.width = 40,
+            this.height = 40,
+            this.img = img[0],
+            this.gravity = 1,
+            this.movingTimer = performance.now(),
+            this.startY = param[2];
+
+            this.current = {
+                'x' : param[1],
+                'y' : param[2],
+                'frame' : 0,
+                'speed' : 22,
+                'action' : 'burning',
+                'timer' : performance.now(),
+            },
+
+            this.boundaries = {
+                'left' : -8,
+                'right' : -8,
+                'top' : -4,
+                'bottom' : -4,
+            },
+
+            this.action = {
+                'burning' : [
+                [(this.width * 1), 240, 100],
+                [(this.width * 2), 240, 100],
+                [(this.width * 3), 240, 100],
+                [(this.width * 4), 240, 100],
+                [(this.width * 5), 240, 100]
+                ]
+            },
+
+            this.wait = function() {
+            },
+
+            this.die = function() {
+
+            },
+
+            this.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+
+                ctx.translate(this.current.x + (this.width/2), this.current.y + (this.height/2));
+                if (this.current.speed > 0) {
+                    ctx.rotate(270*Math.PI/180);
+                } else {
+                    ctx.rotate(90*Math.PI/180);
+                }
+                ctx.translate(0 - (this.current.x + (this.width/2)), 0 - (this.current.y + (this.height/2)) );
+
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.drawBondaries = function(ctx) {
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x-this.boundaries.left, this.current.y-this.boundaries.top, this.width+this.boundaries.left+this.boundaries.right, this.height+this.boundaries.top+this.boundaries.bottom);
+                    ctx.stroke();
+                }                
+            },
+
+            this.hit = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                return !(
+                    (x1 > this.current.x+this.width+this.boundaries.right) ||
+                    (x2 < this.current.x-this.boundaries.left) ||
+                    (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                    (y2 < this.current.y-this.boundaries.top)
+                );
+            },
+
+            this.collision = function(object) {
+
+                if (this.trash != 0) return;
+                
+                x1 = object.previewX();
+                y1 = object.previewY();
+                x2 = object.previewX() + object.width;
+                y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    object.die();
+                }
+            },
+
+            this.script = function() {
+
+                if ((performance.now() - this.movingTimer) > 25) {
+
+                    this.current.y -= this.current.speed;
+                    this.current.speed -= this.gravity;
+
+                    this.movingTimer = performance.now();
+                }
+
+                if (this.startY < this.current.y) this.trash = 1; 
+            },
+
+
+            this.move = function() {
+
+                if (this.trash != 0) return;
+
+                this.script();
+
+                if ((performance.now() - this.current.timer) > this.action[this.current.action][this.current.frame][2]) {
+                   
+                    if (!this.action[this.current.action][this.current.frame + 1]) {
+                        this.current.frame = 0;
+                    } else if (!$.isArray(this.action[this.current.action][this.current.frame + 1])) {
+                        this.current.action = this.action[this.current.action][this.current.frame + 1];
+                        this.current.frame = 0;
+                    } else {
+                        this.current.frame++;
+                    }
+                    this.current.timer = performance.now();
+
+                }
+            }
+
+        };
+
+
+
+        var pikes =  function(param) {
+
+            this.trash = 0,
+            this.width = 70,
+            this.height = 70,
+            this.img = img[4],
+
+            this.current = {
+                'x' : param[1],
+                'y' : param[2],
+            },
+
+            this.boundaries = {
+                'left' : 0,
+                'right' : 0,
+                'top' : -40,
+                'bottom' : 0,
+            },
+
+            this.wait = function() {
+            },
+
+            this.die = function() {
+            },
+
+            this.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                ctx.drawImage(this.img, 347, 0, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            },
+
+            this.drawBondaries = function(ctx) {
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x-this.boundaries.left, this.current.y-this.boundaries.top, this.width+this.boundaries.left+this.boundaries.right, this.height+this.boundaries.top+this.boundaries.bottom);
+                    ctx.stroke();
+                }                
+            },
+
+            this.hit = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                return !(
+                    (x1 > this.current.x+this.width+this.boundaries.right) ||
+                    (x2 < this.current.x-this.boundaries.left) ||
+                    (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                    (y2 < this.current.y-this.boundaries.top)
+                );
+            },
+
+            this.collision = function(object) {
+
+                if (this.trash != 0) return;
+                
+                x1 = object.previewX();
+                y1 = object.previewY();
+                x2 = object.previewX() + object.width;
+                y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    object.die();
+                }
+            },
+
+
+            this.move = function() {
+            }
 
         };

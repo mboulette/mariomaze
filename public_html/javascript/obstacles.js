@@ -87,6 +87,31 @@
         };
 
 
+        var hitZoneR = function(param) {
+            this.me = new hitZone(param);
+
+            this.me.draw = function(ctx) {
+
+                ctx.save();
+
+                
+                ctx.translate(this.x + (this.width/2), this.y + (this.height/2));
+                ctx.scale(1, -1);
+                ctx.translate(0 - (this.x + (this.width/2)), 0 - (this.y + (this.height/2)) );
+
+                ctx.drawImage(img[this.spriteImg], this.spriteX*72, this.spriteY*72, this.width, this.height, this.x, this.y+this.choc, this.width, this.height);
+
+                ctx.restore();
+
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.x, this.y, this.width, this.height);
+                    ctx.stroke();
+                }
+                this.choc = (this.choc == 0) ? 0 : this.choc+5;
+            }
+        };
 
         var platforms = function(param) {
             this.me = new hitZone(param);
