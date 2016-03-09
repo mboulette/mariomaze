@@ -23,15 +23,15 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
-        var startMap = 1;
-        var startPos = 'E0';
+        var startMap = 5;
+        var startPos = 'E1';
         var pause = false;
         var loadedMap = [];
         var board;
         var ctx;
         var background;
         var keyboard = [];
-        var show_bondaries = false;
+        var show_bondaries = true;
         var pattern = [];
         var img = [
             'images/mario.png',
@@ -46,6 +46,28 @@
             //'images/super-mario-makertileset.png',
         ];
 
+        var music_theme = new Audio('musics/intro.mp3');
+        music_theme.volume = 0.03;
+        music_theme.loop = true;
+        music_theme.play();
+
+        
+        var sounds = {
+            'coin' : { 'volume' : 0.05, 'src' : 'sounds/smb3_coin.wav' },
+            'live' : { 'volume' : 0.05, 'src' : 'sounds/smb3_1-up.wav' },
+            'break' : { 'volume' : 0.05, 'src' : 'sounds/smb3_break_brick_block.wav' },
+            'enter' : { 'volume' : 0.05, 'src' : 'sounds/smb3_enter_level.wav' },
+            'fireball' : { 'volume' : 0.05, 'src' : 'sounds/smb3_fireball.wav' },
+            'gameover' : { 'volume' : 0.05, 'src' : 'sounds/smb3_game_over.wav' },
+            'jump' : { 'volume' : 0.05, 'src' : 'sounds/smb3_jump.wav' },
+            'key' : { 'volume' : 0.05, 'src' : 'sounds/smb3_key.wav' },
+            'exit' : { 'volume' : 0.05, 'src' : 'sounds/smb3_map_new_world.wav' },
+            'pause' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pause.wav' },
+            'pipe' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pipe.wav' },
+            'dead' : { 'volume' : 0.05, 'src' : 'sounds/smb3_player_down.wav' },
+            'powerup' : { 'volume' : 0.05, 'src' : 'sounds/smb3_power-up.wav' },
+        };
+
         var createPattern = function(ctx, img, x, y, width, height) { 
             
             var pattern_canvas = document.createElement('canvas');
@@ -59,6 +81,59 @@
             final_pattern = ctx.createPattern(pattern_canvas, "repeat");
 
             return final_pattern;
+        }
+
+        function playSound(key) {
+            var obj = sounds[key];
+
+            var source = audio.createBufferSource();
+            source.buffer = obj.buffer;
+
+            // create a gain node
+            obj.gainNode = audio.createGain();
+
+            // connect the source to the gain node
+            source.connect(obj.gainNode);
+
+            // set the gain (volume)
+            obj.gainNode.gain.value = obj.volume;
+
+            // connect gain node to destination
+            obj.gainNode.connect(audio.destination);
+
+            // play sound
+            source.start(0);
+        }
+
+        function loadSoundObj(obj) {
+
+            var loadFromGitHub = 'https://raw.githubusercontent.com/mboulette/mariomaze/master/public_html/'
+
+            var request = new XMLHttpRequest();
+            request.open('GET', loadFromGitHub + obj.src, true);
+            request.responseType = 'arraybuffer';
+
+            request.onload = function() {
+                audio.decodeAudioData(request.response, function(buffer) {
+                    obj.buffer = buffer;
+                }, function(err) {
+                    throw new Error(err);
+                });
+            }
+
+            request.send();
+        }
+
+        var loadSound = function () {
+
+            // iterate over sounds obj
+            for (i in sounds) {
+                if (sounds.hasOwnProperty(i)) {
+                  // load sound
+                  loadSoundObj(sounds[i]);
+                }
+            }
+
         }
 
         var loadImg = function myself (img_id) {
@@ -340,6 +415,8 @@
                 
                 if (!this.invincible) {
                                         
+                    playSound('dead');
+
                     keyboard = [];
                     this.lives--;
                     map.projectiles = [];
@@ -410,6 +487,7 @@
 
                 map.projectiles.push(tmp);
                 mario.ammos--;
+                playSound('fireball');
                 keyboard[67] = false;
             }
 
@@ -467,7 +545,17 @@
             if (mario.current.action != next_action) {
                 mario.current.action = next_action;
                 mario.current.frame = 0;
+
+
+                switch(next_action) {
+                    case 'jump':
+                        playSound('jump');
+                        break;
+                    default:
+                }
+
             }
+
 
             mario.move();
 
@@ -668,11 +756,18 @@
             requestAnimationFrame(main);
         };
 
+        var pause_game = function() {
+            pause = !pause;
+            music_theme.muted = pause;
+
+            overlay.start(pause);            
+        }
 
         $( document ).ready(function() {
 
             board = $('canvas')[0];
             ctx = board.getContext('2d');
+            audio = new AudioContext();
 
 
             timer = performance.now();
@@ -680,7 +775,9 @@
             map = new level();
             overlay = new overlays();           
 
+            
             loadImg(0);
+            loadSound();
 
             $(document).on('keydown', function (e) {
                 keyboard[e.which] = true;
@@ -688,8 +785,7 @@
                 //console.log(e.which);
 
                 if (e.which == '80') {
-                    pause = !pause;
-                    overlay.start(pause);
+                    pause_game();
                 }
                 return false;
             });
@@ -698,6 +794,16 @@
                 keyboard[e.which] = false;
                 return false;
             });
+
+            $(window).on('focus', function (e) {
+                pause_game();
+            });
+
+            $(window).on('blur', function (e) {
+                pause_game();
+            });
+
+
 
 
 
@@ -710,6 +816,5 @@
 <body style='background-color:#efefef;'>
 
 <canvas width="1024" height="630" style="border:1px solid #000;"></canvas>
-
 </body>
 </html>

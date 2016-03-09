@@ -91,7 +91,7 @@ var level = function() {
 
                     for (x = 0; x < lines.length; x++) {
 
-                        console.log(x, y, lines[x]);
+                        //console.log(x, y, lines[x]);
                         
 
                         if (lines[x][0] == 'E'  && !this.exits[lines[x]] ) this.exits[lines[x]] = {'x' : x*69+1, 'y' : y*69+1 };
@@ -264,6 +264,7 @@ var level = function() {
             'M2' : {'groupe' : 'monsters',  'define' : ['rats', 0, 0]},
             'M3' : {'groupe' : 'monsters',  'define' : ['plants', 0, 0]},
             'M5' : {'groupe' : 'monsters',  'define' : ['bats', 0, 0]},
+            'M6' : {'groupe' : 'monsters',  'define' : ['bowser', 0, 0]},
             'MM' : {'groupe' : 'monsters',  'define' : ['pikes', 0, 0]},
 
             'HH' : {'groupe' : 'items', 'define' : ['ladders', 0, 0, 70, 70, 2, 7, 2]},
@@ -400,7 +401,7 @@ var level = function() {
                     "[]  E1          i     [][][][][][][][][][][][]        [][][]          M5              []",
                     "[][][][][][]      M5    ##?1##  $ $ $ $ $                                             []",
                     "[][][][][][][]          ####                    W1                                E2i []",
-                    "[][][][][][][][]        ##                [][]        []F2[]                      [][][]",
+                    "[][][][][][][][]        ##                [][]        []F2[]              M6      [][][]",
                     "[][]$ $ $ [][][][]            [][]F1[]F1[][]##        [][][]    ############    [][][][]",
                     "[][]$ $$$ [][][][]          [][][][][][][][]##+ [][][][][][][][][][][][][][][][][][][][]",
                     "[][]  ?   [][][][]  _   [][][]F3[][][][][][]##[][][][][][][][][][][][][][][][][][][][][]",

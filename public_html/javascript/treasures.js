@@ -113,7 +113,8 @@
             },
 
             this.bonus = function(object) {
-                object.coins++; 
+                object.coins++;
+                playSound('coin');
             }
         };
 
@@ -231,6 +232,7 @@
 
             this.me.bonus = function(object) {
                 object.lives++; 
+                playSound('live')
             };
 
         };
@@ -282,6 +284,8 @@
 
             this.me.bonus = function(object) {
                 object.invincible = true;
+                playSound('powerup');
+
                 setTimeout(function(object){ 
                     object.invincible = false;
 
@@ -368,7 +372,8 @@
             };
 
             this.me.bonus = function(object) {
-                object.keys++; 
+                object.keys++;
+                playSound('key');
             };
 
         };
@@ -573,6 +578,8 @@
 
                 pause=true;
                 overlay.start(true);
+                playSound('exit');
+
                 setTimeout(function(door){ 
 
                     if (loadedMap[map.exits[door.exit]['map']]) {
@@ -843,6 +850,7 @@
 
                     if ((object.current.velY < 0) && (object.current.y-object.leap > this.current.y+this.height)) {
                         this.trash = 2;
+                        playSound('break');
                     }
 
                     if (object.current.velY > 0) {
@@ -983,6 +991,7 @@
 
                 pause=true;
                 overlay.start(true);
+                playSound('exit');
 
                 setTimeout(function(door){ 
 
