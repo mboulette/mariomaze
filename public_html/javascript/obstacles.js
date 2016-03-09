@@ -163,3 +163,18 @@
                 }
             }
         };
+
+        var fireflips = function(param) {
+            param[3] = 70;
+            param[4] = 70;
+            param[5] = 2;
+            param[6] = 0;
+            param[7] = 9;
+            this.me = new hitZone(param);
+
+            for (var i = 0; i < 9; i++) { 
+                var tmp = new firelame(['firelame', this.me.x+15, this.me.y+10, i*15]);
+                map.monsters.push(tmp.me);
+            }
+
+        };

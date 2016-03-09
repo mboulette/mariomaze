@@ -10,7 +10,7 @@
                 'x' : param[1],
                 'y' : param[2],
                 'frame' : 0,
-                'speed' : 4,
+                'speed' : 5,
                 'action' : 'walk',
                 'timer' : performance.now(),
             },
@@ -894,8 +894,46 @@
         };
 
 
+        var firelame =  function(param) {
+            this.me = new fireball(param);
+            this.me.centerX = param[1];
+            this.me.centerY = param[2];
+            this.me.rayon = param[3];
+            this.me.percent = 0;
+            this.me.current.speed = -1;
 
+            this.me.script = function() {
+                
+                if ((performance.now() - this.movingTimer) > 10) {
 
+                    this.percent++;
+                    if ( this.percent > 200)  this.percent = 1;
+
+                    var angle = Math.PI * (1-this.percent/100);
+                    var x = this.centerX + this.rayon * Math.cos(angle);
+                    var y = this.centerY + this.rayon * Math.sin(angle); 
+
+                    this.current.x = x;
+                    this.current.y = y;
+
+                
+                    //console.log(angle, this.percent);
+
+                    this.movingTimer = performance.now();
+                }
+                /*
+                if ((performance.now() - this.movingTimer) > 25) {
+
+                    this.current.y -= this.current.speed;
+                    this.current.speed -= this.gravity;
+
+                    this.movingTimer = performance.now();
+                }
+
+                if (this.startY < this.current.y) this.trash = 1;
+                */
+            }
+        }
 
         var fireball =  function(param) {
 
@@ -910,7 +948,7 @@
             this.current = {
                 'x' : param[1],
                 'y' : param[2],
-                'frame' : 0,
+                'frame' : Math.floor(Math.random() * 4),
                 'speed' : 22,
                 'action' : 'burning',
                 'timer' : performance.now(),

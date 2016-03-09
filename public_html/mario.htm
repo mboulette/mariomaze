@@ -509,6 +509,7 @@
             if (mario.current.y > board.height/2) {
                 translation.y += ((board.height/2) - mario.current.y)/10; 
             }
+
             
             ctx.translate(translation.x, translation.y);
             ctx.rect(0, 0, board.width-translation.x, board.height-translation.y);
@@ -521,10 +522,14 @@
             if (mario.current.x > board.width/2) {
                 ctx.translate(Math.max((board.width/2) - mario.current.x, board.width-map.width), 0);
             }
-            if (mario.current.y > board.height/2) {
-                ctx.translate(0, Math.max((board.height/2) - mario.current.y, board.height-map.height));
-            }
 
+            var translation = 0;
+            if (mario.current.y > board.height/2) {
+                translation = Math.max((board.height/2) - mario.current.y, board.height-map.height);
+            } else {
+                if (mario.current.action == "stoop") translation -= 140;
+            } 
+            ctx.translate(0, translation);
 
             map.draw();
             mario.draw();
