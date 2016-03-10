@@ -178,3 +178,59 @@
             }
 
         };
+
+
+        var trigger = function(param) {
+            this.x = param[1],
+            this.y = param[2],
+            this.event = param[3],
+            this.width = 70,
+            this.height = 70
+
+            this.hit = function(x1, y1, x2, y2) {
+                return !((y2 < this.y) || (y1 > this.y+this.height) || (x1 > this.x+this.width) || (x2 < this.x));
+            },
+
+            this.collision = function(object) {
+                
+                x1 = object.previewX(); y1 = object.previewY(); x2 = object.previewX() + object.width; y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2)) {
+                    switch (this.event) {
+                        case 'exit_bowser':
+
+                            current_music = music_theme.src;
+                            path = current_music.split( '/' );
+
+                            if ('musics/' + path[path.length-1] != map.theme) {
+                                music_theme.src = map.theme;
+                                music_theme.play();
+                            }
+
+                            break;
+                        case 'enter_bowser':
+
+                            current_music = music_theme.src;
+                            path = current_music.split( '/' );
+                            if (path[path.length-1] != 'boss.mp3') {
+                                music_theme.src = 'musics/boss.mp3';
+                                music_theme.play();  
+                            }
+
+                            break;
+                    }
+
+                }
+            },
+
+
+            this.draw = function(ctx) {
+
+                if (show_bondaries) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.x, this.y, this.width, this.height);
+                    ctx.stroke();
+                }
+            }
+        }

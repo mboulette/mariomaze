@@ -529,10 +529,15 @@
                 
                 //console.log(this.current.action, this.current.y, this.minY, this.maxY );
                 if (this.current.action == 'grow') {
-                    if (this.current.y > this.minY) {
-                        this.current.y -= this.current.speed;
-                        this.height += this.current.speed;
+
+                    if (!this.hit(mario.current.x, mario.current.y+mario.height, mario.current.x+mario.width, mario.current.y+mario.height+10 )) {
+                        if (this.current.y > this.minY) {
+                            this.current.y -= this.current.speed;
+                            this.height += this.current.speed;
+                        }                       
                     }
+
+ 
                 }
                 if (this.current.action == 'hide') {
                     if (this.current.y < this.maxY) {

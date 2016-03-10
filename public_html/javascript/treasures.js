@@ -178,7 +178,8 @@
             };
 
             this.me.bonus = function(object) {
-                object.ammos++; 
+                object.ammos++;
+                playSound('key');
             };
 
         };
@@ -232,7 +233,7 @@
 
             this.me.bonus = function(object) {
                 object.lives++; 
-                playSound('live')
+                playSound('live');
             };
 
         };
@@ -337,6 +338,12 @@
 
             this.me.bonus = function(object) {
                 object.coins += 10; 
+                setTimeout(function(){ playSound('coin'); }, 100);
+                setTimeout(function(){ playSound('coin'); }, 200);
+                setTimeout(function(){ playSound('coin'); }, 300);
+                setTimeout(function(){ playSound('coin'); }, 400);
+                setTimeout(function(){ playSound('coin'); }, 500);
+
             };
 
         };
@@ -614,9 +621,11 @@
                         map.loadMap(maps[map.exits[door.exit]['map']], map.exits[door.exit]['pos']);                       
                     }
 
-                    
-                    music_theme.src = map.theme;
-                    music_theme.play();
+                    if (!mario.invincible) {
+                        music_theme.src = map.theme;
+                        music_theme.play();                        
+                    }
+
                     overlay.start(false);
                     pause=false;
 
@@ -712,7 +721,7 @@
                     if (tmp.me) tmp = tmp.me;
                     map.items.push(tmp);
 
-                    tmp.loadNewMap(object);
+                    //tmp.loadNewMap(object);
 
                 }
             };
@@ -1031,8 +1040,11 @@
 
                     }
 
-                    music_theme.src = map.theme;
-                    music_theme.play();
+                    if (!mario.invincible) {
+                        music_theme.src = map.theme;
+                        music_theme.play();                        
+                    }
+
                     overlay.start(false);
                     pause=false;
 
