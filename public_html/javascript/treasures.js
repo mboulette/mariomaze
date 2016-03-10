@@ -286,8 +286,14 @@
                 object.invincible = true;
                 playSound('powerup');
 
+                music_theme.src = 'musics/invincible.mp3';
+                music_theme.play();
+
                 setTimeout(function(object){ 
                     object.invincible = false;
+
+                music_theme.src = map.theme;
+                music_theme.play();
 
                 }, 20000, object);
             };
@@ -608,6 +614,9 @@
                         map.loadMap(maps[map.exits[door.exit]['map']], map.exits[door.exit]['pos']);                       
                     }
 
+                    
+                    music_theme.src = map.theme;
+                    music_theme.play();
                     overlay.start(false);
                     pause=false;
 
@@ -694,6 +703,7 @@
                 if (this.hit(x1, y1, x2, y2)  && (keyboard[38] || keyboard[40]) && object.keys > 0) {
                     
                     keyboard = [];
+                    playSound('door');
 
                     this.trash = 1;
                     object.keys--;
@@ -1017,9 +1027,12 @@
                         map.items = [];
                         map.projectiles = [];
 
-                        map.loadMap(maps[map.exits[door.exit]['map']], map.exits[door.exit]['pos']);                       
+                        map.loadMap(maps[map.exits[door.exit]['map']], map.exits[door.exit]['pos']);
+
                     }
 
+                    music_theme.src = map.theme;
+                    music_theme.play();
                     overlay.start(false);
                     pause=false;
 

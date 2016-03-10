@@ -80,6 +80,7 @@ var level = function() {
                 this.width = 0 ;
                 this.exits = shema.exits
                 this.name = shema.name;
+                this.theme = shema.theme;
 
 
                 background = ctx.createPattern(img[this.background], "repeat");
@@ -278,8 +279,11 @@ var level = function() {
                 'name' : 'Carte #1.0',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
+                'theme' : 'musics/grasslands.mp3',
                 "exits" :   {
                     'E>' : {'map' : 2, 'pos' :  'E3'},
+                    'E4' : {'map' : 6, 'pos' :  'E6'},
+                    'E5' : {'map' : 6, 'pos' :  'E7'},
                 },
                 'plan' : [
                     "      |                                                                                                                                                                            |",
@@ -289,7 +293,7 @@ var level = function() {
                     "      |                                                                                                                                                                            |",
                     "      |                   ####? ####                                                        $ $ $ $                                           ####                                 |",
                     "  <##>|                                                             $ $                           M1                                                                          E3E> |",
-                    "<#«##»#>                          M1                              $     $                   ########                XX    XX      XX                                        (=======",
+                    "<#«##»#>                          M1                  E4          $     $         E5        ########                XX    XX      XX                                        (=======",
                     "XXXXXXXX            ?     ####?1####                  T0        $         $       M3                              XXXX    XX      XX                                      (=- - - - ",
                     "XXXXXXXX                                      M3      T1    A1$             $     T1                            XXXXXX    XX      XXXX          A1                      (=- - - - - ",
                     "XXXXE2XXE0    A2                              T1      T1                M1        T1                      M1  XXXXXXXX    XX      XXXXXX  M1  M1    M1        M3      (=- - - - - - ",
@@ -304,6 +308,7 @@ var level = function() {
                 'name' : 'Carte #2.0',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
+                'theme' : 'musics/grasslands.mp3',
                 "exits" :   {
                     'E<' : {'map' : 1, 'pos' :  'E3'},
                     'E2' : {'map' : 3, 'pos' :  'E1'},
@@ -346,6 +351,7 @@ var level = function() {
                 'name' : 'Carte #2.1',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 7,
+                'theme' : 'musics/mushroom.mp3',
                 "exits" : {'E1' : {'map' : 2, 'pos' : 'E2'}},
                 'plan' : [
                     "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
@@ -366,6 +372,7 @@ var level = function() {
                 'name' : 'Carte #2.2',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 7,
+                'theme' : 'musics/mushroom.mp3',
                 "exits" : {
                     'E6' : {'map' : 2, 'pos' :  'E4'},
                     'E7' : {'map' : 2, 'pos' :  'E5'},
@@ -390,6 +397,7 @@ var level = function() {
                 'name' : 'Carte #3',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 8,
+                'theme' : 'musics/dungeon.mp3',
                 "exits" : {
                     'E1' : {'map' : 2, 'pos' :  'E8'},
                     'E6' : {'map' : 5, 'pos' :  'E4'},
@@ -422,7 +430,29 @@ var level = function() {
             },
 
 
-
+            6 : {
+                'id' : 6,
+                'name' : 'Carte #2.1',
+                'translation' : {'x' : 0, 'y' : 0},
+                'background' : 7,
+                'theme' : 'musics/mushroom.mp3',
+                "exits" : {
+                    'E6' : {'map' : 1, 'pos' : 'E4'},
+                    'E7' : {'map' : 1, 'pos' : 'E5'},
+                },
+                'plan' : [
+                    "[][][][]T11T[][][][][][][][][]T11T[]",
+                    "[][][][]T11T[][][][][][][][][]T11T[]",
+                    "[][]    T22T              [][]T11T[]",
+                    "[]      E6                  []T22T[]",
+                    "[]    $ $ $ $ $ $ $           E7  []",
+                    "[]                  M2  i         []",
+                    "[]    [][]  ##########            []",
+                    "[]    $ $ $ $ $ $ $         [][][][]",
+                    "[][]    M2              [][][][][][]",
+                    "[][][][][][][][][][][][][][][][][][]",
+                    ]
+            },
 
 
 

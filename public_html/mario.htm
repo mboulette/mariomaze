@@ -23,8 +23,8 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
-        var startMap = 5;
-        var startPos = 'E1';
+        var startMap = 1;
+        var startPos = 'E0';
         var pause = false;
         var loadedMap = [];
         var board;
@@ -65,7 +65,9 @@
             'pause' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pause.wav' },
             'pipe' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pipe.wav' },
             'dead' : { 'volume' : 0.05, 'src' : 'sounds/smb3_player_down.wav' },
+            'loser' : { 'volume' : 0.05, 'src' : 'sounds/loser.mp3' },
             'powerup' : { 'volume' : 0.05, 'src' : 'sounds/smb3_power-up.wav' },
+            'door' : { 'volume' : 0.05, 'src' : 'sounds/smb3_door.wav' },
         };
 
         var createPattern = function(ctx, img, x, y, width, height) { 

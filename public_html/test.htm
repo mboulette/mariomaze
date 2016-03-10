@@ -1,0 +1,52 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mario Test</title>
+
+
+    <script>
+
+    "use strict";
+
+    class Add {
+      constructor(n1, n2) {
+        this.n1 = n1;
+        this.n2 = n2;
+      }
+
+      mu() {
+        this.n1 += 10;
+        return this.n2;
+      }
+
+      get op() {
+        return this.n1 + this.n2;
+      }
+    }
+
+    class Sub extends Add {
+      get op() {
+        return this.n1 - this.n2;
+      }
+    }
+
+
+    var test = new Add(5, 3);
+    var test2 = new Sub(5, 3);
+
+    console.log(test.mu());
+
+    console.log(test.op);
+    console.log(test2.op);
+
+
+    </script>
+
+</head>
+
+<body>
+
+</body>
+</html>

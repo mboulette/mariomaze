@@ -1,0 +1,102 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sound Test</title>
+
+
+    <script>
+        /*
+        var audio = new AudioContext();
+        var sound_coin = new Audio();
+        var bufferSource;
+
+        function playSoundObj(obj) {
+          var source = audio.createBufferSource();
+          source.buffer = obj.buffer;
+
+          // create a gain node
+          obj.gainNode = audio.createGain();
+
+          // connect the source to the gain node
+          source.connect(obj.gainNode);
+
+          // set the gain (volume)
+          obj.gainNode.gain.value = 1;
+
+          // connect gain node to destination
+          obj.gainNode.connect(audio.destination);
+
+          // play sound
+          source.start(0);
+        };
+
+        sound_coin.addEventListener("loadeddata", function() {
+          var reader = new FileReader();
+
+          console.log('toto');
+          
+          reader.onload = function(ev) {  
+
+            audio.decodeAudioData(ev.target.result, function(buffer) {
+              bufferSource.buffer = buffer;
+              bufferSource.noteOn(0);
+
+              playSoundObj(bufferSource);
+            });
+          };
+
+          console.log(this);
+
+          reader.readAsArrayBuffer(this.files[0]);
+        }, false);
+
+        sound_coin.src = 'sounds/smb3_coin.wav';
+        //sound_coin.play();
+        */
+
+
+// Create an <audio> element dynamically.
+var sounds = {'volume' : 0.03, 'src' : 'sounds/smb3_coin.wav' };
+
+
+var audio = new Audio(sounds.src);
+audio.volume = sounds.volume;
+
+var context = new AudioContext();
+var analyser = context.createAnalyser();
+var source = context.createMediaElementSource(audio);
+var bufferSource;
+
+context.decodeAudioData(source, function(buffer) {
+  bufferSource.buffer = buffer;
+  bufferSource.noteOn(0);
+
+  playSoundObj(bufferSource);
+});
+/*
+
+// Wait for window.onload to fire. See crbug.com/112368
+window.addEventListener('load', function(e) {
+  // Our <audio> element will be the audio source.
+  var source = context.createMediaElementSource(audio);
+
+  console.log(source.);
+
+  source.connect(analyser);
+  analyser.connect(context.destination);
+
+  source.start(0);
+
+
+  // ...call requestAnimationFrame() and render the analyser's output to canvas.
+}, false);*/
+    </script>
+
+</head>
+
+<body>
+
+</body>
+</html>
