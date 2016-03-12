@@ -13,15 +13,15 @@
         var pauseTimer = 0;
         var currentTimer = 0;
 
-        var startMap = 1;
-        var startPos = 'E0';
+        var startMap = 5;
+        var startPos = 'E1';
         var pause = true;
         var loadedMap = [];
         var board;
         var ctx;
         var background;
         var keyboard = [];
-        var show_bondaries = false;
+        var show_bondaries = true;
         var pattern = [];
         var img = [
             'images/mario.png',
@@ -55,7 +55,7 @@
             'pause' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pause.wav' },
             'pipe' : { 'volume' : 0.05, 'src' : 'sounds/smb3_pipe.wav' },
             'loser' : { 'volume' : 0.05, 'src' : 'sounds/smb3_player_down.wav' },
-            'dead' : { 'volume' : 0.08, 'src' : 'sounds/loser.mp3' },
+            'dead' : { 'volume' : 0.05, 'src' : 'sounds/loser.mp3' },
             'powerup' : { 'volume' : 0.05, 'src' : 'sounds/smb3_power-up.wav' },
             'door' : { 'volume' : 0.05, 'src' : 'sounds/smb3_door.wav' },
         };
@@ -284,6 +284,10 @@
                 turn = false;
                 for (var i = 0; i < map.monsters.length; i++) {
                     
+                    if (map.monsters[i].shield && map.monsters[i].shield(this.current.x, this.current.y, this.current.x+this.width, this.current.y+this.height)) {
+                        this.trash = 1;
+                        return;
+                    }
 
                     if (map.monsters[i].hit(this.current.x, this.current.y, this.current.x+this.width, this.current.y+this.height)) {
                         this.trash = 1;
@@ -455,7 +459,7 @@
                 
                 if (!this.invincible) {
                                         
-                    playSound('dead');
+                    
 
                     keyboard = [];
                     map.projectiles = [];
@@ -469,9 +473,11 @@
 
                     if (this.lives == 0) {
                         $('#gameOverbox').show();
+                        playSound('gameover');
                         overlay.start(true);    
 
                     } else {
+                        playSound('dead');
                         this.lives--;
                         mario.dying = 1;
                         overlay.toogle();

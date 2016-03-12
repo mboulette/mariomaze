@@ -1157,15 +1157,15 @@
 
         var bowser = function(param) {
             this.trash = 0,
-            this.width = 142,
-            this.height = 142,
+            this.width = 144,
+            this.height = 216,
             this.img = img[0],
             this.gravity = 1,
-            this.lives = 5,
+            this.lives = 6,
 
             this.current = {
                 'x' : param[1],
-                'y' : param[2]-56,
+                'y' : param[2]-140,
                 'frame' : 0,
                 'speed' : -20,
                 'action' : 'walk',
@@ -1175,9 +1175,9 @@
 
             this.boundaries = {
                 'left' : -20,
-                'right' : -25,
-                'top' : -20,
-                'bottom' : -20,
+                'right' : -20,
+                'top' : -90,
+                'bottom' : -10,
             },
 
             this.action = {
@@ -1185,6 +1185,13 @@
                 [(this.width * 0), 650, 100],
                 [(this.width * 1), 650, 100],
                 [(this.width * 2), 650, 100],
+                [(this.width * 3), 650, 100],
+                [(this.width * 4), 650, 100],
+                [(this.width * 5), 650, 100],
+                ],
+
+                'dead' :  [
+                [(this.width * 6), 650, -1],
                 ]
             },
 
@@ -1192,7 +1199,15 @@
             },
 
             this.die = function() {
+                if (this.trash != 0 ) return;
+
                 this.current.lives--;
+
+                if (this.current.lives == 0) {
+                    this.trash = 2;
+                    this.current.action = 'dead';
+                    this.current.frame = 0;
+                }
             },
 
             this.draw = function(ctx) {
@@ -1203,7 +1218,7 @@
                 x = this.action[this.current.action][this.current.frame][0];
                 y = this.action[this.current.action][this.current.frame][1];
 
-                if (this.current.speed < 0) {
+                if (this.current.speed > 0) {
                     ctx.translate(this.current.x + (this.width/2), this.current.y + (this.height/2));
                     ctx.scale(-1, 1);
                     ctx.translate(0 - (this.current.x + (this.width/2)), 0 - (this.current.y + (this.height/2)) );
@@ -1241,10 +1256,31 @@
                         ctx.rect(this.current.x + this.width, this.current.y + this.height , 5, 5);
                         ctx.stroke();
 
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(255, 0, 0, 1)';
+                        ctx.rect(this.current.x + 70, this.current.y + 58 , 70, 70);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 0, 255,1)';
+                        ctx.rect(this.current.x + 10, this.current.y + 90 , 30, 100);
+                        ctx.stroke();
+
+
                     } else {
                         ctx.beginPath();
                         ctx.strokeStyle = 'rgba(0, 0, 255, 1)';
                         ctx.rect(this.current.x, this.current.y + this.height, 5, 5);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(255, 0, 0, 1)';
+                        ctx.rect(this.current.x+5, this.current.y + 58 , 70, 70);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 0, 255,1)';
+                        ctx.rect(this.current.x + 105, this.current.y + 90 , 30, 100);
                         ctx.stroke();
                     }
 
@@ -1252,15 +1288,57 @@
                 }                
             },
 
+            this.shield = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                if (this.current.speed > 0) {
+                    return !(
+                        (x1 > this.current.x+40) ||
+                        (x2 < this.current.x+10) ||
+                        (y1 > this.current.y+190) ||
+                        (y2 < this.current.y+90)
+
+                    );
+
+                } else {
+                    return !(
+                        (x1 > this.current.x+135) ||
+                        (x2 < this.current.x+105) ||
+                        (y1 > this.current.y+190) ||
+                        (y2 < this.current.y+90)
+                    );
+                }
+            },
+
             this.hit = function(x1, y1, x2, y2) {
                 if (this.trash != 0)  return false;
 
-                return !(
-                    (x1 > this.current.x+this.width+this.boundaries.right) ||
-                    (x2 < this.current.x-this.boundaries.left) ||
-                    (y1 > this.current.y+this.height+this.boundaries.bottom) ||
-                    (y2 < this.current.y-this.boundaries.top)
-                );
+                if (this.current.speed > 0) {
+                    return !(
+                        (x1 > this.current.x+this.width+this.boundaries.right) ||
+                        (x2 < this.current.x-this.boundaries.left) ||
+                        (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                        (y2 < this.current.y-this.boundaries.top)
+                    ) || !(
+                        (x1 > this.current.x+140) ||
+                        (x2 < this.current.x+20) ||
+                        (y1 > this.current.y+128) ||
+                        (y2 < this.current.y+58)
+                    );
+
+                } else {
+                    return !(
+                        (x1 > this.current.x+this.width+this.boundaries.right) ||
+                        (x2 < this.current.x-this.boundaries.left) ||
+                        (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                        (y2 < this.current.y-this.boundaries.top)
+                    ) || !(
+                        (x1 > this.current.x+75) ||
+                        (x2 < this.current.x+5) ||
+                        (y1 > this.current.y+128) ||
+                        (y2 < this.current.y+58)
+                    );
+                }
             },
 
             this.collision = function(object) {
