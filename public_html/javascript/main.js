@@ -13,15 +13,15 @@
         var pauseTimer = 0;
         var currentTimer = 0;
 
-        var startMap = 5;
-        var startPos = 'E1';
+        var startMap = 1;
+        var startPos = 'E0';
         var pause = true;
         var loadedMap = [];
         var board;
         var ctx;
         var background;
         var keyboard = [];
-        var show_bondaries = true;
+        var show_bondaries = false;
         var pattern = [];
         var img = [
             'images/mario.png',
@@ -763,6 +763,9 @@
                     mario.current.y = map.start.y;
                     mario.dying = 0;
 
+                    music_theme.src = map.theme;
+                    music_theme.play();
+
                     overlay.start(false);
                     pause=false;
 
@@ -803,6 +806,7 @@
 
                 $('#gameOverbox').hide();
                 $('#beginbox').hide();
+                loadedMap = [];
 
                 mario = new player();
                 map = new level();
@@ -890,7 +894,7 @@
             });
 
             $(window).on('blur', function (e) {
-                pause_game();
+                if (pause==false) pause_game();
             });
 
 

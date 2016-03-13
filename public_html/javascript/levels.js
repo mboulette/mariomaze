@@ -143,11 +143,16 @@ var level = function() {
                                     this.exits[lines[x]]['y'] = tmp.current.y+1;
                                 }
 
+                                if( lines[x] == 'E1' ) {
+                                    this.exits[lines[x]]['y'] = tmp.current.y-30;
+                                }
+
                                 if (lines[x] == start) {
                                     this.start.x = this.exits[lines[x]]['x'];
                                     this.start.y = this.exits[lines[x]]['y'];
                                     mario.current.x = this.exits[lines[x]]['x'];
                                     mario.current.y = this.exits[lines[x]]['y'];
+
                                 }
 
 
@@ -408,7 +413,7 @@ var level = function() {
                 'plan' : [
                     "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
                     "[]                  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
-                    "[]  E1          i     [][][][][][][][][][][][]        [][][]          M5              []",
+                    "[]  E1          i     [][][][][][][][][][][][]        [][][]                          []",
                     "[][][][][][]      M5    ##?1##  $ $ $ $ $             %1  %2                          []",
                     "[][][][][][][]          ####                    W1                                E2i []",
                     "[][][][][][][][]        ##                [][]        []F2[]              M6      [][][]",

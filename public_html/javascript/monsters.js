@@ -921,23 +921,51 @@
                     this.current.x = x;
                     this.current.y = y;
 
-                
-                    //console.log(angle, this.percent);
-
                     this.movingTimer = performance.now();
                 }
-                /*
+            }
+        }
+
+
+        var bowserBreath =  function(param) {
+            this.me = new fireball(param);
+            this.me.current.speed = param[3];
+            this.me.startX = param[1];
+            this.gravity = 4;
+
+            this.me.script = function() {
+
                 if ((performance.now() - this.movingTimer) > 25) {
 
-                    this.current.y -= this.current.speed;
-                    this.current.speed -= this.gravity;
+                    this.current.x += this.current.speed;
+                    this.current.y += this.gravity;
 
                     this.movingTimer = performance.now();
+
+                    if (Math.abs(this.startX - this.current.x) > 400 ) this.trash = 1;
+                }
+            };
+
+            this.me.draw = function(ctx) {
+
+                if (this.trash == 1) return;
+
+                ctx.save();
+                x = this.action[this.current.action][this.current.frame][0];
+                y = this.action[this.current.action][this.current.frame][1];
+                
+                if (this.current.speed < 0) {
+                    ctx.translate(this.current.x + (this.width/2), this.current.y + (this.height/2));
+                    ctx.scale(-1, 1);
+                    ctx.translate(0 - (this.current.x + (this.width/2)), 0 - (this.current.y + (this.height/2)) );
                 }
 
-                if (this.startY < this.current.y) this.trash = 1;
-                */
-            }
+                ctx.drawImage(this.img, x, y, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.restore();
+
+                this.drawBondaries(ctx);
+            };
+
         }
 
         var fireball =  function(param) {
@@ -1162,12 +1190,13 @@
             this.img = img[0],
             this.gravity = 1,
             this.lives = 6,
+            this.fireTimer = performance.now(),
 
             this.current = {
                 'x' : param[1],
                 'y' : param[2]-140,
                 'frame' : 0,
-                'speed' : -20,
+                'speed' : -18,
                 'action' : 'walk',
                 'timer' : performance.now(),
                 'lives' : this.lives,
@@ -1262,8 +1291,18 @@
                         ctx.stroke();
 
                         ctx.beginPath();
-                        ctx.strokeStyle = 'rgba(0, 0, 255,1)';
+                        ctx.strokeStyle = 'rgba(0, 0, 255, 1)';
                         ctx.rect(this.current.x + 10, this.current.y + 90 , 30, 100);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 255, 0, 1)';
+                        ctx.rect(this.current.x + this.width + 20, this.current.y , 300, 100);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 255, 0, 1)';
+                        ctx.rect(this.current.x + this.width + 20, this.current.y+120 , 300, 100);
                         ctx.stroke();
 
 
@@ -1281,6 +1320,16 @@
                         ctx.beginPath();
                         ctx.strokeStyle = 'rgba(0, 0, 255,1)';
                         ctx.rect(this.current.x + 105, this.current.y + 90 , 30, 100);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 255, 0, 1)';
+                        ctx.rect(this.current.x - 320, this.current.y, 300, 100);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(0, 255, 0, 1)';
+                        ctx.rect(this.current.x - 320, this.current.y+120, 300, 100);
                         ctx.stroke();
                     }
 
@@ -1308,6 +1357,50 @@
                         (y2 < this.current.y+90)
                     );
                 }
+            },
+
+            this.fireZoneUp = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                if (this.current.speed > 0) {
+                    return !(
+                        (x1 > this.current.x + this.width + 320) ||
+                        (x2 < this.current.x + this.width + 20) ||
+                        (y1 > this.current.y + 100) ||
+                        (y2 < this.current.y)
+                    );
+
+                } else {
+                    return !(
+                        (x1 > this.current.x - 20) ||
+                        (x2 < this.current.x - 320) ||
+                        (y1 > this.current.y + 100) ||
+                        (y2 < this.current.y)
+                   );
+                }
+
+            },
+
+            this.fireZoneDown = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                if (this.current.speed > 0) {
+                    return !(
+                        (x1 > this.current.x + this.width + 320) ||
+                        (x2 < this.current.x + this.width + 20) ||
+                        (y1 > this.current.y + 220) ||
+                        (y2 < this.current.y + 120)
+                    );
+
+                } else {
+                    return !(
+                        (x1 > this.current.x - 20) ||
+                        (x2 < this.current.x - 320) ||
+                        (y1 > this.current.y + 220) ||
+                        (y2 < this.current.y + 120)
+                   );
+                }
+
             },
 
             this.hit = function(x1, y1, x2, y2) {
@@ -1384,6 +1477,32 @@
                 if (turn) this.current.speed = 0-this.current.speed;
 
                 this.current.x += this.current.speed;
+
+
+                if (performance.now() - this.fireTimer > 1000) {
+
+                    if (this.fireZoneUp(mario.current.x, mario.current.y, mario.current.x+mario.width, mario.current.y+mario.height)) {
+                        //console.log('up');
+                        this.fireTimer = performance.now();
+
+                        var tmp = new bowserBreath(['bowserBreath', this.current.x+(this.width/2), this.current.y-this.boundaries.top, this.current.speed / 2]);
+                        map.monsters.push(tmp.me);
+
+                        return;
+                    }
+
+                    if (this.fireZoneDown(mario.current.x, mario.current.y, mario.current.x+mario.width, mario.current.y+mario.height)) {
+                        //console.log('down');
+                        this.fireTimer = performance.now();
+
+                        var tmp = new bowserBreath(['bowserBreath', this.current.x+(this.width/2), this.current.y-this.boundaries.top+50, this.current.speed / 2 ]);
+                        map.monsters.push(tmp.me);
+
+                        return;
+                    }
+
+                }
+
 
             },
 

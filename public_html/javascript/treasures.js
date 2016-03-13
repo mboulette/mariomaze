@@ -951,7 +951,6 @@
                     ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
                     ctx.rect(this.current.x, this.current.y, this.width, this.height);
                     ctx.stroke();
-                    ctx.beginPath();
                 }
 
                 this.drawBondaries(ctx);    
