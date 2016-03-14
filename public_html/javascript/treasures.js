@@ -1274,7 +1274,73 @@
         };
 
 
-        var elevators =  function(param) {
+        var princess = function(param) {
+            this.width = 70,
+            this.height = 144,            
+
+            this.current = {
+                'x' : param[1] - 69,
+                'y' : param[2],
+            },
+
+            this.die = function() {
+            },
+
+            this.wait = function() {
+            },
+
+            this.move = function() {
+
+            },
+
+            this.draw = function(ctx) {
+                ctx.drawImage(img[0], 0, 0, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                this.drawBondaries(ctx);
+            },
+
+            this.boundaries = {
+                'left' : -2,
+                'right' : -2,
+                'top' : -40,
+                'bottom' : -2,
+            },
+
+            this.drawBondaries = function(ctx) {
+                if (show_bondaries && this.trash == 0) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.rect(this.current.x-this.boundaries.left, this.current.y-this.boundaries.top, this.width+this.boundaries.left+this.boundaries.right, this.height+this.boundaries.top+this.boundaries.bottom);
+                    ctx.stroke();
+                }                
+            },
+
+            this.hit = function(x1, y1, x2, y2) {
+                if (this.trash != 0)  return false;
+
+                return !(
+                    (x1 > this.current.x+this.width+this.boundaries.right) ||
+                    (x2 < this.current.x-this.boundaries.left) ||
+                    (y1 > this.current.y+this.height+this.boundaries.bottom) ||
+                    (y2 < this.current.y-this.boundaries.top)
+                );
+            },
+
+            this.collision = function(object) {
+                
+                x1 = object.previewX(); y1 = object.previewY(); x2 = object.previewX() + object.width; y2 = object.previewY() + object.height;
+
+                if (this.hit(x1, y1, x2, y2) && !keyboard[40]) {
+
+                    console.log('You Win!');
+
+                }
+            },
+
+
+        }
+
+
+        var elevators = function(param) {
 
             this.trash = 0,
             this.width = 70,

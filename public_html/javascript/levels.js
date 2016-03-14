@@ -283,7 +283,7 @@ var level = function() {
 
             1 : {
                 'id' : 1,
-                'name' : 'Carte #1.0',
+                'name' : 'La prairie',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
                 'theme' : 'musics/grasslands.mp3',
@@ -312,7 +312,7 @@ var level = function() {
 
             2 : {
                 'id' : 2,
-                'name' : 'Carte #2.0',
+                'name' : 'Le sentier du chateau',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 1,
                 'theme' : 'musics/grasslands.mp3',
@@ -355,7 +355,7 @@ var level = function() {
             
             3 : {
                 'id' : 3,
-                'name' : 'Carte #2.1',
+                'name' : 'Le magasin',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 7,
                 'theme' : 'musics/mushroom.mp3',
@@ -376,7 +376,7 @@ var level = function() {
 
             4 : {
                 'id' : 4,
-                'name' : 'Carte #2.2',
+                'name' : 'Le tunnel souterrain',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 7,
                 'theme' : 'musics/mushroom.mp3',
@@ -401,7 +401,7 @@ var level = function() {
 
             5 : {
                 'id' : 5,
-                'name' : 'Carte #3',
+                'name' : 'Le chateau de Bowser',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 8,
                 'theme' : 'musics/dungeon.mp3',
@@ -409,6 +409,7 @@ var level = function() {
                     'E1' : {'map' : 2, 'pos' :  'E8'},
                     'E6' : {'map' : 5, 'pos' :  'E4'},
                     'E4' : {'map' : 5, 'pos' :  'E6'},
+                    'E2' : {'map' : 7, 'pos' :  'E1'},
                 },
                 'plan' : [
                     "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]",
@@ -439,7 +440,7 @@ var level = function() {
 
             6 : {
                 'id' : 6,
-                'name' : 'Carte #2.1',
+                'name' : 'La chambre secrette',
                 'translation' : {'x' : 0, 'y' : 0},
                 'background' : 7,
                 'theme' : 'musics/mushroom.mp3',
@@ -461,6 +462,31 @@ var level = function() {
                     ]
             },
 
+
+
+            7 : {
+                'id' : 7,
+                'name' : 'La cellule de la princesse',
+                'translation' : {'x' : 0, 'y' : 0},
+                'background' : 7,
+                'theme' : 'musics/mushroom.mp3',
+                "exits" : {
+                    'E1' : {'map' : 5, 'pos' : 'E2'},
+                },
+                'plan' : [
+                    "[][][][][][][][][][][][][][][][][][][][][][]",
+                    "[][][][][][][][][][][][][][][][][][][][][][]",
+                    "[]                                        []",
+                    "[]                                        []",
+                    "[]                                        []",
+                    "[]                                        []",
+                    "[]      E1                                []",
+                    "[]    [][][]                              []",
+                    "[]  [][][][][]                      P1    []",
+                    "[][][][][][][][][][][][][][][][][][][][][][]",
+                    "[][][][][][][][][][][][][][][][][][][][][][]",
+                    ]
+            },
 
 
         };
