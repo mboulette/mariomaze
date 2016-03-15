@@ -9,10 +9,17 @@
             return target.replace(new RegExp(search, 'g'), replacement);
         };
 
+        String.prototype.lpad = function(padstr, length) {
+            var str = this;           
+            while (str.length < length) str = padstr + str;
+            return str;
+        }
+
         var startTimer = 0;
         var pauseTimer = 0;
         var currentTimer = 0;
 
+        var gameover = false;
         var startMap = 5;
         var startPos = 'E2';
         var pause = true;
@@ -315,6 +322,7 @@
         var player = function() {
 
             this.invincible = false;
+            this.kill = 0,
             this.ammos = 100,
             this.lives = 3,
             this.coins = 0,
@@ -474,7 +482,8 @@
                     if (this.lives == 0) {
                         $('#gameOverbox').show();
                         playSound('gameover');
-                        overlay.start(true);    
+                        overlay.start(true);
+                        gameover = true;
 
                     } else {
                         playSound('dead');
@@ -709,7 +718,7 @@
             ctx.textAlign="left";
 
             curTimer = new Date(currentTimer);
-            strTimer = curTimer.getUTCHours() + ":" + curTimer.getUTCMinutes() + ":" + curTimer.getUTCSeconds() + ":" + Math.floor(curTimer.getUTCMilliseconds()/100);
+            strTimer = curTimer.getUTCHours().lpad('0', 2) + ":" + curTimer.getUTCMinutes().lpad('0', 2) + ":" + curTimer.getUTCSeconds().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).lpad('0', 2);
             //ctx.fillText("x:"+Math.floor((mario.current.x+mario.height)/70)+", y:"+Math.floor(mario.current.y/70), 10, 18);
             ctx.fillText(strTimer, 10, 18);
 
@@ -806,6 +815,7 @@
 
                 $('#gameOverbox').hide();
                 $('#beginbox').hide();
+                $('#youWinbox').hide();
                 loadedMap = [];
 
                 mario = new player();
@@ -814,6 +824,7 @@
                 map.loadMap(maps[startMap], startPos);
                 music_theme.src = map.theme;
                 music_theme.play();
+                gameover = false;
 
                 main();
                 overlay.start(false);
@@ -841,7 +852,7 @@
                 map.clean();
             }
 
-            requestAnimationFrame(main);
+            if (!gameover) requestAnimationFrame(main);
         };
 
         var pause_game = function() {

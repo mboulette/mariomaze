@@ -1332,7 +1332,41 @@
 
                 if (this.hit(x1, y1, x2, y2)) {
 
-                    console.log('You Win!');
+                    //console.log('You Win!');
+
+
+                    keyboard = [];
+                    map.projectiles = [];
+
+                    pause=true;
+
+                    $('#youWinbox').show();
+                    playSound('powerup');
+                    overlay.start(true);
+                    gameover = true;
+
+
+                    5min = 5 * 60 * 1000;
+                    curTimer = new Date(currentTimer);
+                    strTimer = curTimer.getUTCHours().lpad('0', 2) + ":" + curTimer.getUTCMinutes().lpad('0', 2) + ":" + curTimer.getUTCSeconds().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).lpad('0', 2);
+
+                    $('#end_timer').html(strTimer);
+                    $('#end_coins').html(mario.coins);
+                    $('#end_ammos').html(mario.ammos);
+                    $('#end_monsters').html(mario.kill);
+                    $('#end_keys').html(mario.keys);
+                    $('#end_lives').html(mario.lives);
+
+                    points_timer = Math.max(0, Math.round(5min - strTimer));
+                    $('#points_timer').html( points_timer );
+                    $('#points_coins').html(mario.coins);
+                    $('#points_ammos').html(mario.ammos * 20);
+                    $('#points_monsters').html(mario.kill * 50);
+                    $('#points_keys').html(mario.keys * 100);
+                    $('#points_lives').html(mario.lives * 200);
+
+                    points_total = points_timer + mario.coins + (mario.ammos * 20) + (mario.kill * 50) + (mario.keys * 100) + (mario.lives * 200);
+                    $('#points_total').html(points_total);
 
                 }
             }

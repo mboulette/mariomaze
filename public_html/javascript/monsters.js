@@ -40,6 +40,7 @@
                 this.current.y += 2;
                 this.width -= 10;
                 this.trash = 2;
+                mario.kill +=1;
 
                 setTimeout(function(object){ 
                     object.current.action = 'walk';
@@ -236,6 +237,7 @@
                 this.current.frame = 0;
                 this.current.y += 1;
                 this.trash = performance.now();
+                mario.kill +=1;
 
                setTimeout(function(object){ 
                     object.trash = 1;
@@ -295,6 +297,7 @@
                 this.current.action = 'dead';
                 this.current.frame = 0;
                 this.trash = 2;
+                mario.kill +=1;
 
                 setTimeout(function(object){ 
                     object.trash = 1;
@@ -482,6 +485,7 @@
             this.me.die = function() {
                 this.current.action = 'dead';
                 this.current.frame = 0;
+                mario.kill +=1;
             },
 
             this.me.action = {
@@ -1236,6 +1240,7 @@
                     this.trash = 2;
                     this.current.action = 'dead';
                     this.current.frame = 0;
+                    mario.kill +=1;
                 }
             },
 
