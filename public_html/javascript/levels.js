@@ -249,6 +249,7 @@ var level = function() {
             '* ' : {'groupe' : 'items',     'define' : ['stars', 0, 0]},
             'i ' : {'groupe' : 'items',     'define' : ['torches', 0, 0]},
             '+ ' : {'groupe' : 'items',     'define' : ['keys', 0, 0]},
+            'P1' : {'groupe' : 'items',     'define' : ['princess', 0, 0]},
             'S1' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 7, 4]},
             'S2' : {'groupe' : 'items',     'define' : ['decorations', 0, 0, 70, 70, 2, 3, 0]},
             'SE' : {'groupe' : 'obstacles', 'define' : ['sign', 0, 0, 70, 70, 2, 4, 6, 'A VENDRE']},
@@ -468,7 +469,7 @@ var level = function() {
                 'id' : 7,
                 'name' : 'La cellule de la princesse',
                 'translation' : {'x' : 0, 'y' : 0},
-                'background' : 7,
+                'background' : 9,
                 'theme' : 'musics/mushroom.mp3',
                 "exits" : {
                     'E1' : {'map' : 5, 'pos' : 'E2'},

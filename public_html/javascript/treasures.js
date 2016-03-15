@@ -1276,11 +1276,12 @@
 
         var princess = function(param) {
             this.width = 70,
-            this.height = 144,            
+            this.height = 100,  
+            this.trash = 0,          
 
             this.current = {
-                'x' : param[1] - 69,
-                'y' : param[2],
+                'x' : param[1],
+                'y' : param[2] - 30,
             },
 
             this.die = function() {
@@ -1294,7 +1295,7 @@
             },
 
             this.draw = function(ctx) {
-                ctx.drawImage(img[0], 0, 0, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
+                ctx.drawImage(img[0], 700, 0, this.width, this.height, this.current.x, this.current.y, this.width, this.height);
                 this.drawBondaries(ctx);
             },
 
@@ -1329,15 +1330,15 @@
                 
                 x1 = object.previewX(); y1 = object.previewY(); x2 = object.previewX() + object.width; y2 = object.previewY() + object.height;
 
-                if (this.hit(x1, y1, x2, y2) && !keyboard[40]) {
+                if (this.hit(x1, y1, x2, y2)) {
 
                     console.log('You Win!');
 
                 }
-            },
+            }
 
 
-        }
+        };
 
 
         var elevators = function(param) {

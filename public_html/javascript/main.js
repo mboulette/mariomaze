@@ -13,8 +13,8 @@
         var pauseTimer = 0;
         var currentTimer = 0;
 
-        var startMap = 1;
-        var startPos = 'E0';
+        var startMap = 5;
+        var startPos = 'E2';
         var pause = true;
         var loadedMap = [];
         var board;
@@ -33,7 +33,7 @@
             'images/enemies.png',
             'images/cave.jpg',
             'images/bricks.jpg',
-            //'images/super-mario-makertileset.png',
+            'images/bg-princess.jpg',
         ];
 
         var music_theme = new Audio('musics/intro.mp3');
