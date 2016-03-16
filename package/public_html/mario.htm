@@ -1,0 +1,122 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mario Test</title>
+    <script src="javascript/jquery-2.2.1.min.js"></script>
+    <script src="javascript/decorations.js"></script>
+    <script src="javascript/obstacles.js"></script>
+    <script src="javascript/treasures.js"></script>
+    <script src="javascript/levels.js"></script>
+    <script src="javascript/monsters.js"></script>
+    <script src="javascript/main.js"></script>
+    <style>
+        p {font-size: 16px;}
+    </style>
+</head>
+
+<body style='margin:0; background-image:url(images/wallpaper.jpg); width:1024px; height:630px; background-size: cover; background-repeat:no-repeat; font-family: "Comic Sans MS"'>
+    <canvas width="1024" height="630"></canvas>
+
+    <table width="1024" height="630" style="position: absolute; left:0; top:0;">
+        <tr>
+            <td align="center" valign="center">
+                    
+                    <div id='beginbox' style="background-color: rgba(255, 255, 255, 0.5); width: 60%; padding:30px; border-radius: 20px;">
+                        <h1>MARIO MAZE</h1>
+
+                        <p>
+                        Bienvenu dans mon petit jeu imitation de Sper Mario Bros.<br>
+                        Le but est de libérer la princesse de Bowser dans le moins de temps possible.
+                        </p>
+                        <p>
+                        Contrairement à mario, vos boules de feu sont comptés, et vous devez ammasser des clés pour ouvrir les portes.
+                        </p>
+
+                        <p>Voici les touches pour jouer:</p>
+
+                        <p>[&larr;][&rarr;] Pour vous déplacer <br>
+                        [Z] Pour courrir <br>
+                        [X], [&uarr;] [SPACEBAR] Pour sauter<br>
+                        [C] Pour lancer des boules de feu <br>
+                        [P] Pour mettre le jeux sur pause <br>
+                        [&darr;] Pour vous pencher <br>
+                        [&uarr;] ou [&darr;] Pour ouvrir des portes, entrer dans les tuyeaux et grimper aux échelles <br>
+                        <p>
+
+                        <progress value="0" min="0" max="24" style="width: 200px;"></progress>
+
+                        <span id='begin' style="display:none">Appuyer sur [ENTER] pour commencer.</span>
+
+                    </div>
+
+                    <div id='gameOverbox' style="background-color: rgba(255, 255, 255, 0.5); width: 60%; padding:30px; border-radius: 20px; display:none;">
+                        <h1>GAME OVER</h1>
+                        <span >Appuyer sur [ENTER] pour recommencer.</span>
+                    </div>
+
+                    <div id='youWinbox' style="background-color: rgba(255, 255, 255, 0.5); width: 60%; padding:30px; border-radius: 20px; display:none;">
+                        <h1>Vous avez gagné!</h1>
+                        <p> Vous avez trouvé la princesse en </p>
+                        <h2 class='end_timer'></h2>
+
+                        <b>Pointage :</b>
+                        <table cellpading='3'>
+                            <tr>
+                                <td align='center'><strong>Qté</strong></td>
+                                <td align='center'><strong>Bonus</strong></td>
+                                <td align='center'><strong>Points</strong></td>
+                            </tr>
+                            <tr>
+                                <td align='right' class='end_timer'></td>
+                                <td align='center'>Temps =</td>
+                                <td align='right' id='points_timer'></td>
+                            </tr>
+                            <tr>
+                                <td align='right' id='end_coins'></td>
+                                <td align='center'>Pièces x 1 =</td>
+                                <td align='right' id='points_coins'></td>
+                            </tr>
+                            <tr>
+                                <td align='right' id='end_ammos'></td>
+                                <td align='center'>Fireball x 20 =</td>
+                                <td align='right' id='points_ammos'></td>
+                            </tr>
+                            <tr>
+                                <td align='right' id='end_monsters'></td>
+                                <td align='center'>Monstres x 50 =</td>
+                                <td align='right' id='points_monsters'></td>
+                            </tr>
+                            <tr>
+                                <td align='right' id='end_keys'></td>
+                                <td align='center'>Clés x 100 =</td>
+                                <td align='right' id='points_keys'></td>
+                            </tr>
+                            <tr>
+                                <td align='right' id='end_lives'></td>
+                                <td align='center'>Vies x 200 =</td>
+                                <td align='right' id='points_lives'></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td align='center'><strong>TOTAL</strong></td>
+                                <td align='right' id='points_total' style='font-weight: bold;'></td>
+                            </tr>
+
+                        </table>
+
+
+                        <span >Appuyer sur [ENTER] pour recommencer.</span>
+                    </div>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
+
+
+
+

@@ -106,8 +106,8 @@
 
         function loadSoundObj(obj) {
 
-            var loadFromGitHub = 'https://raw.githubusercontent.com/mboulette/mariomaze/master/public_html/'
-            //var loadFromGitHub = '';
+            //var loadFromGitHub = 'https://raw.githubusercontent.com/mboulette/mariomaze/master/public_html/'
+            var loadFromGitHub = '';
 
             var request = new XMLHttpRequest();
             request.open('GET', loadFromGitHub + obj.src, true);

@@ -48,7 +48,7 @@
                     object.width += 10;
                     object.trash = 0;
 
-                }, 10000, this);
+                }, 15000, this);
             },
 
             this.draw = function(ctx) {
@@ -195,9 +195,8 @@
 
             this.move = function() {
 
-                if (this.trash != 0) return;
-
                 fall = this.script();
+                if (this.trash != 0) return;
 
                 if ((performance.now() - this.current.timer) >this.action[this.current.action][this.current.frame][2]) {
 
@@ -235,7 +234,6 @@
             this.me.die = function() {
                 this.current.action = 'dead';
                 this.current.frame = 0;
-                this.current.y += 1;
                 this.trash = performance.now();
                 mario.kill +=1;
 
@@ -496,7 +494,7 @@
                      [0*72, 5*72, 4000], 'grow',
                 ],
                 'dead' : [
-                     [0*72, 5*72, 10000], 'grow',
+                     [0*72, 5*72, 15000], 'grow',
                 ],
                 'eat' : [
                      [0*72, 5*72, 1000],

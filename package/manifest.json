@@ -1,0 +1,12 @@
+{
+  "name": "Mario Maze",
+  "description": "Un petit jeux du style Super Mario Bros, pour pratiquer des concepts de Javascript et Canvas",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["public_html/javascript/background.js"]
+    }
+  },
+  "icons": { "16": "public_html/images/icon_mario_16.png", "128": "/public_html/images/icon_mario_128.png" }
+}
