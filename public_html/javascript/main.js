@@ -20,8 +20,8 @@
         var currentTimer = 0;
 
         var gameover = false;
-        var startMap = 5;
-        var startPos = 'E2';
+        var startMap = 1;
+        var startPos = 'E0';
         var pause = true;
         var loadedMap = [];
         var board;
@@ -323,10 +323,10 @@
 
             this.invincible = false;
             this.kill = 0,
-            this.ammos = 100,
+            this.ammos = 0,
             this.lives = 3,
             this.coins = 0,
-            this.keys = 2,
+            this.keys = 0,
             this.width = 46,
             this.height = 90,
             this.speed = 5,
@@ -718,14 +718,14 @@
             ctx.textAlign="left";
 
             curTimer = new Date(currentTimer);
-            strTimer = curTimer.getUTCHours().lpad('0', 2) + ":" + curTimer.getUTCMinutes().lpad('0', 2) + ":" + curTimer.getUTCSeconds().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).lpad('0', 2);
+            strTimer = curTimer.getUTCHours().toString().lpad('0', 2) + ":" + curTimer.getUTCMinutes().toString().lpad('0', 2) + ":" + curTimer.getUTCSeconds().toString().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).toString();
             //ctx.fillText("x:"+Math.floor((mario.current.x+mario.height)/70)+", y:"+Math.floor(mario.current.y/70), 10, 18);
             ctx.fillText(strTimer, 10, 18);
 
             ctx.font = '14pt Comic Sans MS';
             ctx.textAlign="center";
-            ctx.strokeText(map.name, board.width/2, 22);
-            ctx.fillText(map.name, board.width/2, 22);
+            ctx.strokeText(map.name, board.width/2 - 200, 22);
+            ctx.fillText(map.name, board.width/2 - 200, 22);
             
 
             ctx.textAlign="right";

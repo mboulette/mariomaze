@@ -950,6 +950,10 @@
                 }
             };
 
+            this.me.wait = function() {
+                this.trash = 1;
+            },
+
             this.me.draw = function(ctx) {
 
                 if (this.trash == 1) return;
@@ -1008,11 +1012,12 @@
                 ]
             },
 
-            this.wait = function() {
-            },
 
             this.die = function() {
 
+            },
+
+            this.wait = function() {
             },
 
             this.draw = function(ctx) {

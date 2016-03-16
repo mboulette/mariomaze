@@ -1346,18 +1346,19 @@
                     gameover = true;
 
 
-                    5min = 5 * 60 * 1000;
+                    five_min = 5 * 60 * 1000 * 100;
                     curTimer = new Date(currentTimer);
-                    strTimer = curTimer.getUTCHours().lpad('0', 2) + ":" + curTimer.getUTCMinutes().lpad('0', 2) + ":" + curTimer.getUTCSeconds().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).lpad('0', 2);
+                    strTimer = curTimer.getUTCHours().toString().lpad('0', 2) + ":" + curTimer.getUTCMinutes().toString().lpad('0', 2) + ":" + curTimer.getUTCSeconds().toString().lpad('0', 2) + ":" + Math.floor(curTimer.getUTCMilliseconds()/100).toString();
 
-                    $('#end_timer').html(strTimer);
+                    $('.end_timer').html(strTimer);
                     $('#end_coins').html(mario.coins);
                     $('#end_ammos').html(mario.ammos);
                     $('#end_monsters').html(mario.kill);
                     $('#end_keys').html(mario.keys);
                     $('#end_lives').html(mario.lives);
 
-                    points_timer = Math.max(0, Math.round(5min - strTimer));
+                    points_timer = Math.max(0, Math.round(five_min - curTimer));
+                    console.log(points_timer);
                     $('#points_timer').html( points_timer );
                     $('#points_coins').html(mario.coins);
                     $('#points_ammos').html(mario.ammos * 20);
