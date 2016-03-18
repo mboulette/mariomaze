@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+    <title>Jeu en multi simple</title>
+    <style>
+        html, body {
+          width:  100%;
+          height: 100%;
+          margin: 0px;
+          overflow: hidden;
+        }
+
+        canvas { background-color: #eee;
+          width:  100%;
+          height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas></canvas>
+
+
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+    var uuid = new Date().getTime();
+    var socket = io.connect('https://nodejs-mboulette.rhcloud.com');
+    var timer = performance.now();
+    var players = {};
+
+    $( window ).resize(function() {
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;        
+    });
+
+    $( document ).ready(function() {
+        board = $('canvas')[0];
+        ctx = board.getContext('2d');
+        
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+        
+
+        var player = function() {
+            this.x = 300;
+            this.y = 300;
+            this.keyboard = [];
+        }
+
+        var render = function() {
+
+            ctx.clearRect(0, 0, board.width, board.height);
+
+            
+            for(var index in players) { 
+                var cur_player = players[index]; 
+
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+                ctx.rect(cur_player.x, cur_player.y, 20, 20);
+                ctx.fill();
+            }
+        }
+
+        var update = function() {
+
+            var delta = performance.now() - timer;
+
+            for(var index in players) { 
+                var cur_player = players[index]; 
+
+
+                if (cur_player.keyboard[37]) { // left arrow
+                    cur_player.x -= 1 * delta;
+                }
+
+                if (cur_player.keyboard[38]) { // up arrow
+                    cur_player.y -= 1 * delta;   
+                }
+
+                if (cur_player.keyboard[39]) { // right arrow
+                    cur_player.x += 1 * delta;
+                }
+
+                if (cur_player.keyboard[40]) { //down arrow
+                    cur_player.y += 1 * delta;
+                }
+
+            }
+
+            timer = performance.now();
+        }
+
+        var main = function() {
+
+            update();               
+            render();
+
+            requestAnimationFrame(main);
+        };
+
+
+        $(document).on('keydown', function (e) {
+            msg = {'user' : uuid, 'event' : 'keydown', 'which' : e.which};
+            socket.emit('action', msg);
+
+            return false;
+        });
+
+        $(document).on('keyup', function (e) {
+            msg = {'user' : uuid, 'event' : 'keyup', 'which' : e.which};
+            socket.emit('action', msg);
+
+            return false;
+        });
+
+        socket.on('action', function(json){
+            if (json.event == 'new-player') {
+                players[json.user] = new player();
+            }
+
+            if (json.event == 'keydown' || json.event == 'keyup') {
+                if (!players[json.user]) players[json.user] = new player();
+                players[json.user].keyboard[json.which] = json.event == 'keydown';                
+            }
+
+            console.log(players);
+        });
+
+
+        //var player1 = new players();
+        msg = {'user' : uuid, 'event' : 'new-player'};
+        socket.emit('action', msg);
+
+        main();
+
+
+    });
+
+    
+
+    </script>
+</body>
+</html>
